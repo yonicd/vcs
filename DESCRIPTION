@@ -1,19 +1,19 @@
-Package: remote
+Package: vcs
 Type: Package
-Title: Managing, inspecting and sourcing remote repositories without the need to clone
+Title: Managing, Inspecting and Sourcing Remote Repositories on a Version Control System
 Version: 0.1.0
-Date: 2017-04-11
+Date: 2017-06-08
 Author: Jonathan Sidi [aut, cre]
 Maintainer: Jonathan Sidi <yonis@metrumrg.com>
-Description: Managing, inspecting and sourcing remote repositories without the need to clone
+Description: Managing, inspecting and sourcing remote repositories such as github, bitbucket and subversion without the need to clone
 Depends:
   R (>= 2.3.0)
 Imports:
-  stringr,utils,tools,plyr,d3Tree,httr
+  tools, httr, plyr, d3Tree, jsTree
 License: GPL-2 | GPL-3
 URL: https://github.com/yonicd/remote
 BugReports: https://github.com/yonicd/remote/issues
 LazyData: true
 NeedsCompilation: no
-Packaged: 2017-01-31 14:00:00 UTC; Yoni
+Packaged: 2017-06-08 14:00:00 UTC; Yoni
 RoxygenNote: 6.0.1

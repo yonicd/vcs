@@ -17,7 +17,7 @@
 #' In this case of the recursive parameter takes over-rides over the list parameter.
 #' @examples 
 #' grepr(pattern = 'gsub',path = '.',value=TRUE,recursive = T)
-#' grepr(pattern = 'importFrom',path = c(repo='yonicd/ciderhouse',subdir='R'),value=TRUE)
+#' grepr(pattern = 'importFrom',path = list(repo='yonicd/ciderhouse',subdir='R'),value=TRUE)
 #' @export
 #' 
 grepr=function(pattern,path,recursive=FALSE,padding=0,...){
@@ -25,9 +25,8 @@ grepr=function(pattern,path,recursive=FALSE,padding=0,...){
   list2env(grepVars,envir = environment())
   if(is.character(path)) fl=list.files(path,recursive = recursive,full.names = TRUE)
   if(is.list(path)){
-    path$recursive=recursive
     path$full.names=TRUE
-    fl=do.call(ls_github,path)
+    fl=do.call(ls_remote,path)
   } 
 
   out=sapply(fl,function(x){

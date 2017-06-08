@@ -1,23 +1,25 @@
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param repo PARAM_DESCRIPTION
-#' @param subdir PARAM_DESCRIPTION
-#' @param r.file PARAM_DESCRIPTION
-#' @param flag PARAM_DESCRIPTION, Default: TRUE
+#' @title Source File on a Remote Repository
+#' @description Evaluate script directly from remote repository 
+#' including reading data and nested sources.
+#' @param repo character, username/repo_name
+#' @param subdir character, subdirectory of repository
+#' @param r.file character, file name to source
+#' @param vcs character, choose which version control system to search (github, bitbucket), Default: 'github'
+#' @param flag boolean, checks to see if the file is a nested file Default: TRUE
 #' @examples 
 #' repo='stan-dev/example-models'
 #' subdir='ARM/Ch.10'
 #' r.file='10.6_IVinaRegressionFramework.R'
-#' source_github(repo,subdir,r.file)
+#' source_remote(repo,subdir,r.file)
 #' @export
-source_github=function(repo,subdir,r.file,flag=TRUE){
+source_remote=function(repo,subdir,r.file,vcs='github',flag=TRUE){
 
   #Read R code ----  
-  r.code=readLines(code.loc)
+  r.code=readLines(filepath)
   #strsplit(gsub('\\r','',RCurl::getURL(code.loc)[1]),'\\n')[[1]]
   
   #Rewrite paths for source and read commands to url path ----
-  for(i in which(grepl('read|source',r.code))) r.code[i]=setwd_github(r.code[i])
+  for(i in which(grepl('read|source',r.code))) r.code[i]=setwd_remote(r.code[i])
   stan.find=which(grepl('stan\\(',r.code))
   to.unlink=rep(NA,length(stan.find))
   
