@@ -10,7 +10,7 @@ vcs is a R package that allows users to gain control over their remote repositor
   - **navigate_remote**: visualize the structure of a remote branch prior to cloning/forking
   - **source_remote**: source script on remote branches, works for reading in data on remote and nested sourcing.
 
-## Functionalitues that clone or update a cloned repository
+## Functionalities that clone or update a cloned repository
   - **sparse_checkout**: create a sparse checkout of a repository on github or bitbucket.
   - **update_depth**: if the git repository was checked out with a depth setting, use this function to update or cancel the depth setting.
 
