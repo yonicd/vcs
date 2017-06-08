@@ -3,12 +3,12 @@
 remote is a R package that allows users to gain control over their remote repositories from within R. 
 
 ## Functionalities that do not need a clone
-  - grepr: run recursive grep directly on remote branches
-  - ls_github: list files on remote branches on github and return their raw addresses
-  - setwd_github: set the working directory to a remote branch to run script directly on it, including reading data and nested sourcing.
-  - source_github: source script on remote branches
-  - show_repo: visualize the structure of a remote branch prior to cloning/forking
-  - ls_head: return directory structure of remote branch prior to cloning/forking
+  - **grepr**: run recursive grep directly on remote branches
+  - **ls_github**: list files on remote branches on github and return their raw addresses
+  - **setwd_github**: set the working directory to a remote branch to run script directly on it, including reading data and nested sourcing.
+  - **source_github**: source script on remote branches
+  - **show_repo**: visualize the structure of a remote branch prior to cloning/forking
+  - **ls_head**: return directory structure of remote branch prior to cloning/forking
 
 ## grepr
 Function that applies a recursive grep in R to search in entire directory tree on a local path or in github, returns grep by file that matches pattern. 
