@@ -71,8 +71,8 @@ ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github',full
          svn={
            chk_svn<-TRUE
            uri_svn <- sprintf('svn info %s',path)
-           chk_svn <- length(suppressWarnings(x<-system(uri_svn,intern = TRUE)))>0
-           if(chk_svn) stop(sprintf("repo: %s not found", uri))
+           chk_svn <- length(suppressWarnings(x<-system(uri_svn,intern = TRUE)))==0
+           if(chk_svn) stop(sprintf("repo: %s not found", uri_svn))
            td <- tempdir()
            system(sprintf('svn co %s --depth empty %s',path,td)) 
            setwd(td)
