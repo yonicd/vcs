@@ -15,12 +15,11 @@ diff_head(path = ".", vcs = "git", pattern = NULL, ..., show = TRUE)
 
 \item{...}{arguments passed to grep}
 
-\item{show}{boolean, if false returns only boolean output of HEAD%in%local, Default: TRUE}
+\item{show}{boolean, if false returns only boolean output of HEAD\%in\%local, Default: TRUE}
 }
 \value{
 character
 }
 \description{
-Query the difference in files between current fetch and the head of a repository, 
-assuming that there is either a .git or .svn folder in the path.
+Query the difference in files between current fetch and the head of a repository, assuming that there is either a .git or .svn folder in the path.
 }

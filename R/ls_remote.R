@@ -96,7 +96,7 @@ ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github',full
              }
            }
            setwd(this_wd)
-           unlink(td, recursive=TRUE)
+           if(newdir) unlink(td, recursive=TRUE)
          }
   )
   setwd(this_wd)
