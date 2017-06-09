@@ -77,6 +77,7 @@ ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github',full
            system(sprintf('svn co %s --depth empty %s',path,td)) 
            setwd(td)
            pathout<-system("svn ls -R | grep -v '/$'",intern = TRUE)
+           setwd(this_wd)
            unlink(td)
          }
   )
