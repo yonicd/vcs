@@ -72,7 +72,7 @@ ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github',full
            
            chk_svn<-FALSE
            
-           if(dir.exists(tools::file_path_as_absolute(path))){
+           if(dir.exists(path)){
              newdir=FALSE
              td <- tools::file_path_as_absolute(path)
            }else{
@@ -96,7 +96,7 @@ ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github',full
              }
            }
            setwd(this_wd)
-           unlink(td)
+           unlink(td, recursive=TRUE)
          }
   )
   setwd(this_wd)
