@@ -4,7 +4,7 @@
 \alias{diff_head}
 \title{Query the difference in files between current fetch and the head of a repository}
 \usage{
-diff_head(path = ".", vcs = "git", pattern = NULL, ...)
+diff_head(path = ".", vcs = "git", pattern = NULL, ..., show = TRUE)
 }
 \arguments{
 \item{path}{character, Path to root directory of git/svn repository, Default: '.'}
@@ -14,6 +14,8 @@ diff_head(path = ".", vcs = "git", pattern = NULL, ...)
 \item{pattern}{character, string containing a regular expression, Default: NULL}
 
 \item{...}{arguments passed to grep}
+
+\item{show}{boolean, if false returns only boolean output of HEAD%in%local, Default: TRUE}
 }
 \value{
 character
