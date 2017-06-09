@@ -29,11 +29,14 @@ Recursive call to grep in R
 }
 \details{
 if path is a character then the pattern is checked against a location on the local machine, 
-if path is a list with arguments containing params for ls_github(repo,subdir) 
-then the pattern is checked on the specified github repository (repository must be public).
+if path is a list with arguments containing params for ls_remote
+then the pattern is checked on the specified remote repository (repository must be public).
 In this case of the recursive parameter takes over-rides over the list parameter.
 }
 \examples{
 grepr(pattern = 'gsub',path = '.',value=TRUE,recursive = T)
-grepr(pattern = 'importFrom',path = list(repo='yonicd/ciderhouse',subdir='R'),value=TRUE)
+grepr(pattern = 'importFrom',path = list(path='yonicd/vcs',subdir='R'))
+grepr(pattern = 'importFrom',path = list(path='yonicd/vcs',subdir='R'),value=TRUE)
+grepr(pattern = 'importFrom',path = list(path='yonicd/vcs',subdir='R'),value=TRUE,padding=3)
+grepr(pattern = 'tags$script',path = list(path = 'timelyportfolio/vueR',subdir='R|inst'),padding=3,value=TRUE,fixed=TRUE)
 }
