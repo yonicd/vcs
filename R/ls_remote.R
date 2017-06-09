@@ -35,7 +35,7 @@ ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github',full
              if(subdir=='.'){
                s=s[!grepl('/',s)]
              }else{
-               s=grep(paste0('^',subdir,'/'),s,value=TRUE)   
+               s=grep(paste0('^',subdir,'(.*?)/'),s,value=TRUE)   
              }
            }
            if(full.names) s=sprintf('https://raw.githubusercontent.com/%s/%s/%s',path,branch,s) 
@@ -50,7 +50,7 @@ ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github',full
                if(subdir=='.'){
                  s=s[!grepl('/',s)]
                }else{
-                 s=grep(paste0('^',subdir,'/'),s,value=TRUE)   
+                 s=grep(paste0('^',subdir,'(.*?)/'),s,value=TRUE)   
                }
              }
            if(full.names) s=sprintf('https://bitbucket.org/%s/raw/%s/%s',path,branch,s) 
@@ -63,7 +63,7 @@ ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github',full
              if(subdir=='.'){
                s=s[!grepl('/',s)]
              }else{
-               s=grep(paste0('^',subdir,'/'),s,value=TRUE)   
+               s=grep(paste0('^',subdir,'(.*?)/'),s,value=TRUE)   
              }
            }
            pathout <- s

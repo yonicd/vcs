@@ -32,18 +32,28 @@ grepr=function(pattern,path,recursive=FALSE,padding=0,...){
   out=sapply(fl,function(x){
     args=grepVars
     args$pattern=pattern
+    if(is.null(args$value)) args$value=FALSE
     args$x=readLines(x,warn = FALSE)
     
-    if(padding>0){
-      g=grep(args$pattern,args$x)
-      if(length(g)>0){
+    if(padding>0&args$value){
+      g0=grep(args$pattern,args$x)
+      if(length(g0)>0){
+        g=g0
+        if(length(g0)>1){
+          rmIdx=which(tail(g0,-1)-head(g0,-1)<=padding)
+          if(length(rmIdx)>0) g=g0[-c(rmIdx+1)]
+        } 
         gdx=sapply(g,function(x,pad,nmax) seq(from=pmax(1,x-pad),to=pmin(nmax,x+pad)),pad=padding,nmax=length(args$x))
-        apply(gdx,2,function(i) data.frame(row=i,result=args$x[i],stringsAsFactors = FALSE))
+        out=unique(c(apply(gdx,2,function(i){
+              ifelse(i%in%g0,sprintf('[row %s]: %s',i,args$x[i]),sprintf('row %s: %s',i,args$x[i]))
+            })))
+        
       }
     }else{
       do.call('grep',args)
     } 
   })
+  
   out[sapply(out,length)>0]
   
 }
