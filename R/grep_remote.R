@@ -36,7 +36,9 @@ grepr=function(pattern,path,recursive=FALSE,padding=0,...){
     args$x=readLines(x,warn = FALSE)
     
     if(padding>0&args$value){
-      g0=grep(args$pattern,args$x)
+      args0<-args
+      args0$value=FALSE
+      g0=do.call(grep,args0)
       if(length(g0)>0){
         g=g0
         if(length(g0)>1){
@@ -44,7 +46,7 @@ grepr=function(pattern,path,recursive=FALSE,padding=0,...){
           if(length(rmIdx)>0) g=g0[-c(rmIdx+1)]
         } 
         gdx=sapply(g,function(x,pad,nmax) seq(from=pmax(1,x-pad),to=pmin(nmax,x+pad)),pad=padding,nmax=length(args$x))
-        out=unique(c(apply(gdx,2,function(i){
+        out=unique(unlist(sapply(gdx,function(i){
               ifelse(i%in%g0,sprintf('[row %s]: %s',i,args$x[i]),sprintf('row %s: %s',i,args$x[i]))
             })))
         
