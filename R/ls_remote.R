@@ -90,12 +90,15 @@ ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github',full
            if(is.null(subdir)) subdir=''
            
              if(subdir=='.'){
-               pathout<-system("svn ls | grep -v '/$'",intern = TRUE)
+               s<-system("svn ls | grep -v '/$'",intern = TRUE)
              }else{
-               pathout<-system(sprintf("svn ls -R | grep '^%s'",subdir),intern = TRUE)
-               pathout<-pathout[!grepl('/$',pathout)]
+               s<-system(sprintf("svn ls -R | grep '^%s'",subdir),intern = TRUE)
+               s<-s[!grepl('/$',s)]
              }
-           
+           if(full.names){
+            s <- file.path(ifelse(newdir,path,td),s)
+           }
+           pathout <- s
            setwd(this_wd)
            if(newdir) unlink(td, recursive=TRUE)
          }
