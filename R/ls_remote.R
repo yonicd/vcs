@@ -87,14 +87,15 @@ ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github',full
            if(newdir) system(sprintf('svn co %s --depth empty %s',path,td)) 
            setwd(td)
            
-           if(!is.null(subdir)){
+           if(is.null(subdir)) subdir=''
+           
              if(subdir=='.'){
                pathout<-system("svn ls | grep -v '/$'",intern = TRUE)
              }else{
                pathout<-system(sprintf("svn ls -R | grep '^%s'",subdir),intern = TRUE)
                pathout<-pathout[!grepl('/$',pathout)]
              }
-           }
+           
            setwd(this_wd)
            if(newdir) unlink(td, recursive=TRUE)
          }
