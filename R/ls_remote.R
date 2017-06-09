@@ -69,14 +69,32 @@ ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github',full
            pathout <- s
          },
          svn={
-           chk_svn<-TRUE
+           
+           chk_svn<-FALSE
+           
+           if(dir.exists(tools::file_path_as_absolute(path))){
+             newdir=FALSE
+             td <- tools::file_path_as_absolute(path)
+           }else{
+             newdir=TRUE
+             td <- tempdir()  
+           }
+           
            uri_svn <- sprintf('svn info %s',path)
            chk_svn <- length(suppressWarnings(x<-system(uri_svn,intern = TRUE)))==0
            if(chk_svn) stop(sprintf("repo: %s not found", uri_svn))
-           td <- tempdir()
-           system(sprintf('svn co %s --depth empty %s',path,td)) 
+           
+           if(newdir) system(sprintf('svn co %s --depth empty %s',path,td)) 
            setwd(td)
-           pathout<-system("svn ls -R | grep -v '/$'",intern = TRUE)
+           
+           if(!is.null(subdir)){
+             if(subdir=='.'){
+               pathout<-system("svn ls | grep -v '/$'",intern = TRUE)
+             }else{
+               pathout<-system(sprintf("svn ls -R | grep '^%s'",subdir),intern = TRUE)
+               pathout<-pathout[!grepl('/$',pathout)]
+             }
+           }
            setwd(this_wd)
            unlink(td)
          }
