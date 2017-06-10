@@ -30,7 +30,7 @@ navigate_remote <- function(path=getwd(), branch='master', vcs='github', output=
   switch(output,
          jsTree={
            tree.args$obj = pathout
-           tree.args$gh_repo = ifelse(vcs%in%c('github','git'),path,NULL)
+           tree.args$remote_repo = ifelse(vcs%in%c('github','git'),path,NULL)
            tree.args=c(tree.args,output.opts)
            do.call(jsTree::jsTree,tree.args)
          },
