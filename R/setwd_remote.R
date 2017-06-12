@@ -4,7 +4,7 @@
 #' @param path character, path to append
 #' @param tokens character, vectors of functions names that will be have a path appended to them.
 #' @export
-setwd_remote=function(r.script.raw,repo,subdir,vcs='github',tokens=NULL){
+setwd_remote=function(r.script.raw,repo,branch='master',subdir,vcs='github',tokens=NULL){
 
   #read file from path
     #r.script.raw=readLines(filepath)
@@ -15,7 +15,7 @@ setwd_remote=function(r.script.raw,repo,subdir,vcs='github',tokens=NULL){
   #replace all dbl quotes with single quotes
     r.script=gsub('\\"',"'",r.script)
   #update keys with user added
-    keys=paste0(sprintf('\\b%s\\b',c('read','source',tokens)),collapse='|')
+    keys=paste0(sprintf('\\b%s\\b',c(tokens)),collapse='|')
   #locate lines with keys
     keyInd=grep(keys,r.script)
   #save them to str.key
@@ -48,12 +48,10 @@ setwd_remote=function(r.script.raw,repo,subdir,vcs='github',tokens=NULL){
     if(length(find.file)==0) stop(sprintf('%s not found in %s/%s'),str.change,repo,subdir)
     down.address=ls.path[find.file]
     file.name=gsub('\\s+<-.*$|\\s+=.*$','',r.script.raw)
-    eval(parse(text=sprintf("%s<<-tempfile(fileext = tools::file_ext('%s'))",file.name,str.change)))
-    
-    eval(parse(text=sprintf("download.file('%s',%s,quiet = T,method='curl')",
-                            down.address,file.name))
-         )
-    
+    eval(parse(text=sprintf("%s<<-tempfile(pattern = 'VCS_',fileext = tools::file_ext('%s'))",file.name,str.change)))
+    #eval(parse(text=sprintf("assign(file.name,envir = parent.frame(),%s)",file.name)))
+    eval(parse(text=sprintf("download.file('%s',%s,quiet = T,method='curl')",down.address,file.name)))
+    message(str.change,' downloaded from ',down.address,' and placed in tempfile')
     r.script.new=gsub(str.old,file.name,r.script)    
     
   }

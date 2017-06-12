@@ -4,8 +4,8 @@
 \alias{source_remote}
 \title{Source File on a Remote Repository}
 \usage{
-source_remote(repo, subdir, r.file, branch = "master", vcs = "github",
-  flag = TRUE)
+source_remote(repo, subdir, r.file, tokens = NULL, branch = "master",
+  vcs = "github", flag = TRUE)
 }
 \arguments{
 \item{repo}{character, username/repo_name}
@@ -13,6 +13,8 @@ source_remote(repo, subdir, r.file, branch = "master", vcs = "github",
 \item{subdir}{character, subdirectory of repository}
 
 \item{r.file}{character, file name to source}
+
+\item{tokens}{character, vectors of functions names that will be have a path appended to them}
 
 \item{branch}{character, alias of the branch in the repository, Default: 'master'}
 
@@ -29,6 +31,6 @@ including reading data and nested sources.
 repo='stan-dev/example-models'
 subdir='ARM/Ch.10'
 r.file='10.4_LackOfOverlapWhenTreat.AssignmentIsUnknown.R'
-source_remote(repo,subdir,r.file)
+source_remote(repo,subdir,r.file,tokens='stan')
 }
 }

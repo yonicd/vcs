@@ -5,6 +5,7 @@
 #' @param branch character, alias of the branch in the repository, Default: 'master'
 #' @param subdir character, subdirectory of repository
 #' @param r.file character, file name to source
+#' @param tokens character, vectors of functions names that will be have a path appended to them
 #' @param vcs character, choose which version control system to search (github, bitbucket), Default: 'github'
 #' @param flag boolean, checks to see if the file is a nested file Default: TRUE
 #' @examples 
@@ -12,10 +13,10 @@
 #' repo='stan-dev/example-models'
 #' subdir='ARM/Ch.10'
 #' r.file='10.4_LackOfOverlapWhenTreat.AssignmentIsUnknown.R'
-#' source_remote(repo,subdir,r.file)
+#' source_remote(repo,subdir,r.file,tokens='stan')
 #' }
 #' @export
-source_remote=function(repo,subdir,r.file,branch='master',vcs='github',flag=TRUE){
+source_remote=function(repo,subdir,r.file,tokens=NULL,branch='master',vcs='github',flag=TRUE){
   
   if(vcs=='bitbucket') path=file.path('https://bitbucket.org',repo,'raw',branch,subdir)
   if(vcs=='github') path=file.path('https://raw.githubusercontent.com',repo,branch,subdir)
@@ -26,13 +27,17 @@ source_remote=function(repo,subdir,r.file,branch='master',vcs='github',flag=TRUE
   r.code=readLines(filepath)
   #strsplit(gsub('\\r','',RCurl::getURL(code.loc)[1]),'\\n')[[1]]
   
-  #Rewrite paths for source and read commands to url path ----
-  for(i in which(grepl('read|source',r.code))) r.code[i]=setwd_remote(r.code[i],repo,subdir,vcs,'stan')
-  stan.find=which(grepl('stan\\(',r.code))
-  to.unlink=rep(NA,length(stan.find))
+  tokens.str=paste0(tokens,'\\(')
+  #tokens<-c('read','source',tokens.str)
+  tokens<-c('read','source')
   
-  #Find the names of the objects that the stan calls are saved to ----
-  keep.files=gsub(' ','',unlist(lapply(strsplit(r.code[which(grepl('stan\\(',r.code))],'<-'),'[',1)))
+  #Rewrite paths for source and read commands to url path ----
+  for(i in grep(paste0(tokens,collapse='|'),r.code)) r.code[i]=setwd_remote(r.code[i],repo,branch,subdir,vcs,tokens)
+  token.find=which(grepl(tokens.str,r.code))
+  to.unlink=rep(NA,length(token.find))
+  
+  #Find the names of the objects that the token calls are saved to ----
+  keep.files=gsub(' ','',unlist(lapply(strsplit(r.code[which(grepl(tokens.str,r.code))],'<-'),'[',1)))
   
   # Comment out print calls ----
   r.code=gsub('print','#print',r.code)
@@ -44,36 +49,30 @@ source_remote=function(repo,subdir,r.file,branch='master',vcs='github',flag=TRUE
     }
   }
   
-  #Download the stan file to a temp file and change the call to stan from a text object to a connection ----
-  if(length(stan.find)>0){
-    for(i in 1:length(stan.find)){
-      x=c(as.numeric(gregexpr('\\"',r.code[stan.find[i]])[[1]]),as.numeric(gregexpr("\\'",r.code[stan.find[i]])[[1]]))
-      x=x[x!=-1]
-      file.name=basename(substr(r.code[stan.find[i]],x[1]+1,x[2]-1))
-      #eval(parse(text=paste0(file.name,' <- tempfile()')))
-      #eval(parse(text=sprintf("download.file('%s/%s',%s,quiet = T,method='curl')",path,file.name,file.name)))
+  #Download the token files to a temp.file and change the call to a connection ----
+  if(length(token.find)>0){
+    for(i in 1:length(token.find)){
+      
+      str.old=regmatches(r.code[token.find[i]],regexpr("\\'(.*?)\\'", r.code[token.find[i]]))
+      str.change=basename(gsub("[\\']",'',str.old[1]))  
+      file.name=basename(str.change)
       
       ls.path=ls_remote(path=repo,branch = branch,subdir=subdir,vcs = vcs,full.names = TRUE)
       find.file=match(file.name,basename(ls.path))
       if(length(find.file)==0) stop(sprintf('%s not found in %s/%s'),file.name,repo,subdir)
       down.address=ls.path[find.file]
-      eval(parse(text=sprintf("%s<-tempfile(fileext = tools::file_ext('%s'))",file.name,file.name)))
-      
-      eval(parse(text=sprintf("download.file('%s',%s,quiet = T,method='curl')",
-                              down.address,file.name))
-      )
-      
+      eval(parse(text=sprintf("%s<-tempfile(pattern = 'VCS_',fileext = tools::file_ext('%s'))",file.name,file.name)))
+      eval(parse(text=sprintf("download.file('%s',%s,quiet = T,method='curl')",down.address,file.name)))
+      message(str.change,' downloaded from ',down.address,' and placed in tempfile')
       to.unlink[i]=file.name
-      r.code[stan.find[i]]=gsub(substr(r.code[stan.find[i]],x[1],x[2]),
-                                strip.path(substr(r.code[stan.find[i]],x[1]+1,x[2]-1)),
-                                r.code[stan.find[i]])
+      r.code[token.find[i]]=gsub(str.old,str.change,r.code[token.find[i]])
     }
   }
   
   #Evaluate new code ----
   eval(parse(text=r.code))
   
-  #Unlink temp stan files ----
+  #Unlink temp token files ----
   junk=sapply(to.unlink[!is.na(to.unlink)],unlink)
   
   #Return objects (conditional if call is nested or not) ----
