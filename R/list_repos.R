@@ -16,7 +16,6 @@
 #' }
 #' @export 
 #' @importFrom httr content GET
-#' @importFrom plyr ldply
 list_repos<-function(user, vcs='github',fields='full_name'){
   switch(vcs,
          github={

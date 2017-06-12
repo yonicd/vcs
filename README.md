@@ -5,7 +5,7 @@ vcs is a R package that allows users to gain control over their remote repositor
 ## Installation
 ```r
 devtools::install_github('metrumresearchgroup/vcs')
-```
+``` 
 
 ## Functionalities that do not need a clone
   - **grepr**: run recursive grep directly on remote branches

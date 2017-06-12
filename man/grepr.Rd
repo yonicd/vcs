@@ -34,9 +34,14 @@ then the pattern is checked on the specified remote repository (repository must 
 In this case of the recursive parameter takes over-rides over the list parameter.
 }
 \examples{
-grepr(pattern = 'gsub',path = '.',value=TRUE,recursive = T)
-grepr(pattern = 'importFrom',path = list(path='yonicd/vcs',subdir='R'))
-grepr(pattern = 'importFrom',path = list(path='yonicd/vcs',subdir='R'),value=TRUE)
-grepr(pattern = 'importFrom',path = list(path='yonicd/vcs',subdir='R'),value=TRUE,padding=3)
-grepr(pattern = 'tags$script',path = list(path = 'timelyportfolio/vueR',subdir='R|inst'),padding=3,value=TRUE,fixed=TRUE)
+grepr(pattern = 'gsub',path = '.',value=TRUE,recursive = TRUE)
+thisrepo='metrumresearchgroup/vcs'
+\donttest{
+remotepath=list(path=thisrepo,subdir='R',vcs='github')
+grepr(pattern = 'importFrom',path = remotepath)
+grepr(pattern = 'importFrom',path = remotepath,value=TRUE)
+grepr(pattern = 'importFrom',path = remotepath,value=TRUE,padding=3)
+grepr(pattern = 'tags$script',
+      path = list(path = 'timelyportfolio/vueR',subdir='R|inst',vcs='github'),
+padding=3,value=TRUE,fixed=TRUE)}
 }

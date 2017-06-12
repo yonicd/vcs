@@ -16,13 +16,18 @@
 #' then the pattern is checked on the specified remote repository (repository must be public).
 #' In this case of the recursive parameter takes over-rides over the list parameter.
 #' @examples 
-#' grepr(pattern = 'gsub',path = '.',value=TRUE,recursive = T)
-#' grepr(pattern = 'importFrom',path = list(path='yonicd/vcs',subdir='R'))
-#' grepr(pattern = 'importFrom',path = list(path='yonicd/vcs',subdir='R'),value=TRUE)
-#' grepr(pattern = 'importFrom',path = list(path='yonicd/vcs',subdir='R'),value=TRUE,padding=3)
-#' grepr(pattern = 'tags$script',path = list(path = 'timelyportfolio/vueR',subdir='R|inst'),padding=3,value=TRUE,fixed=TRUE)
+#' grepr(pattern = 'gsub',path = '.',value=TRUE,recursive = TRUE)
+#' thisrepo='metrumresearchgroup/vcs'
+#' \donttest{
+#' remotepath=list(path=thisrepo,subdir='R',vcs='github')
+#' grepr(pattern = 'importFrom',path = remotepath)
+#' grepr(pattern = 'importFrom',path = remotepath,value=TRUE)
+#' grepr(pattern = 'importFrom',path = remotepath,value=TRUE,padding=3)
+#' grepr(pattern = 'tags$script',
+#'       path = list(path = 'timelyportfolio/vueR',subdir='R|inst',vcs='github'),
+#' padding=3,value=TRUE,fixed=TRUE)}
 #' @export
-#' 
+#' @importFrom utils head tail
 grepr=function(pattern,path,recursive=FALSE,padding=0,...){
   grepVars=list(...)
   list2env(grepVars,envir = environment())
@@ -54,7 +59,7 @@ grepr=function(pattern,path,recursive=FALSE,padding=0,...){
       if(length(g0)>0){
         g=g0
         if(length(g0)>1){
-          rmIdx=which(tail(g0,-1)-head(g0,-1)<=padding)
+          rmIdx=which(utils::tail(g0,-1)-utils::head(g0,-1)<=padding)
           if(length(rmIdx)>0) g=g0[-c(rmIdx+1)]
         } 
         gdx=sapply(g,function(x,pad,nmax) seq(from=pmax(1,x-pad),to=pmin(nmax,x+pad)),pad=padding,nmax=length(args$x))

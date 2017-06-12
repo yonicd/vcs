@@ -4,7 +4,8 @@
 \alias{source_remote}
 \title{Source File on a Remote Repository}
 \usage{
-source_remote(repo, subdir, r.file, vcs = "github", flag = TRUE)
+source_remote(repo, subdir, r.file, branch = "master", vcs = "github",
+  flag = TRUE)
 }
 \arguments{
 \item{repo}{character, username/repo_name}
@@ -12,6 +13,8 @@ source_remote(repo, subdir, r.file, vcs = "github", flag = TRUE)
 \item{subdir}{character, subdirectory of repository}
 
 \item{r.file}{character, file name to source}
+
+\item{branch}{character, alias of the branch in the repository, Default: 'master'}
 
 \item{vcs}{character, choose which version control system to search (github, bitbucket), Default: 'github'}
 
@@ -22,8 +25,10 @@ Evaluate script directly from remote repository
 including reading data and nested sources.
 }
 \examples{
+\donttest{
 repo='stan-dev/example-models'
 subdir='ARM/Ch.10'
-r.file='10.6_IVinaRegressionFramework.R'
+r.file='10.4_LackOfOverlapWhenTreat.AssignmentIsUnknown.R'
 source_remote(repo,subdir,r.file)
+}
 }

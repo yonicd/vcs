@@ -11,12 +11,9 @@
 #' then the pattern is checked on the specified pulic github repository
 #' @return data.frame
 #' @export
-#' @importFrom tools file_path_as_absolute
-#' @importFrom d3Tree d3tree df2tree
+#' @importFrom d3Tree df2tree d3tree
 #' @importFrom jsTree jsTree
 #' @importFrom plyr rbind.fill
-#' @importFrom htmltools html_print
-#' @importFrom httr http_error GET content
 #' @examples 
 #' navigate_remote('tidyverse/glue')
 #' navigate_remote('tidyverse/glue',branch='named_args')

@@ -4,21 +4,14 @@
 \alias{setwd_remote}
 \title{Set the working directory to a Github repository URL address}
 \usage{
-setwd_remote(repo, branch = "master", subdir, r.file, vcs = "github",
-  tokens = "stan")
+setwd_remote(r.script.raw, repo, subdir, vcs = "github", tokens = NULL)
 }
 \arguments{
-\item{repo}{character, username/repo_name}
-
-\item{branch}{character, branch of repository, Default: 'master'}
-
-\item{subdir}{character, subdirectory of repository}
-
-\item{r.file}{character, file name to source}
-
-\item{vcs}{character, choose which version control system to search (github, bitbucket), Default: 'github'}
+\item{r.script.raw}{character, script to append remote path.}
 
 \item{tokens}{character, vectors of functions names that will be have a path appended to them.}
+
+\item{path}{character, path to append}
 }
 \description{
 Appends to read and source calls URL path.

@@ -2,24 +2,32 @@
 #' @description Evaluate script directly from remote repository 
 #' including reading data and nested sources.
 #' @param repo character, username/repo_name
+#' @param branch character, alias of the branch in the repository, Default: 'master'
 #' @param subdir character, subdirectory of repository
 #' @param r.file character, file name to source
 #' @param vcs character, choose which version control system to search (github, bitbucket), Default: 'github'
 #' @param flag boolean, checks to see if the file is a nested file Default: TRUE
 #' @examples 
+#' \donttest{
 #' repo='stan-dev/example-models'
 #' subdir='ARM/Ch.10'
-#' r.file='10.6_IVinaRegressionFramework.R'
+#' r.file='10.4_LackOfOverlapWhenTreat.AssignmentIsUnknown.R'
 #' source_remote(repo,subdir,r.file)
+#' }
 #' @export
-source_remote=function(repo,subdir,r.file,vcs='github',flag=TRUE){
-
+source_remote=function(repo,subdir,r.file,branch='master',vcs='github',flag=TRUE){
+  
+  if(vcs=='bitbucket') path=file.path('https://bitbucket.org',repo,'raw',branch,subdir)
+  if(vcs=='github') path=file.path('https://raw.githubusercontent.com',repo,branch,subdir)
+  
+  filepath=file.path(path,r.file)
+  
   #Read R code ----  
   r.code=readLines(filepath)
   #strsplit(gsub('\\r','',RCurl::getURL(code.loc)[1]),'\\n')[[1]]
   
   #Rewrite paths for source and read commands to url path ----
-  for(i in which(grepl('read|source',r.code))) r.code[i]=setwd_remote(r.code[i])
+  for(i in which(grepl('read|source',r.code))) r.code[i]=setwd_remote(r.code[i],repo,subdir,vcs,'stan')
   stan.find=which(grepl('stan\\(',r.code))
   to.unlink=rep(NA,length(stan.find))
   
@@ -42,11 +50,23 @@ source_remote=function(repo,subdir,r.file,vcs='github',flag=TRUE){
       x=c(as.numeric(gregexpr('\\"',r.code[stan.find[i]])[[1]]),as.numeric(gregexpr("\\'",r.code[stan.find[i]])[[1]]))
       x=x[x!=-1]
       file.name=basename(substr(r.code[stan.find[i]],x[1]+1,x[2]-1))
-      eval(parse(text=paste0(file.name,' <- tempfile()')))
-      loc.file=paste0('"',dat.loc,file.name,'"')
-      eval(parse(text=paste0('download.file(',loc.file,',',file.name,',quiet = T,method="curl")')))
+      #eval(parse(text=paste0(file.name,' <- tempfile()')))
+      #eval(parse(text=sprintf("download.file('%s/%s',%s,quiet = T,method='curl')",path,file.name,file.name)))
+      
+      ls.path=ls_remote(path=repo,branch = branch,subdir=subdir,vcs = vcs,full.names = TRUE)
+      find.file=match(file.name,basename(ls.path))
+      if(length(find.file)==0) stop(sprintf('%s not found in %s/%s'),file.name,repo,subdir)
+      down.address=ls.path[find.file]
+      eval(parse(text=sprintf("%s<-tempfile(fileext = tools::file_ext('%s'))",file.name,file.name)))
+      
+      eval(parse(text=sprintf("download.file('%s',%s,quiet = T,method='curl')",
+                              down.address,file.name))
+      )
+      
       to.unlink[i]=file.name
-      r.code[stan.find[i]]=gsub(substr(r.code[stan.find[i]],x[1],x[2]),strip.path(substr(r.code[stan.find[i]],x[1]+1,x[2]-1)),r.code[stan.find[i]])
+      r.code[stan.find[i]]=gsub(substr(r.code[stan.find[i]],x[1],x[2]),
+                                strip.path(substr(r.code[stan.find[i]],x[1]+1,x[2]-1)),
+                                r.code[stan.find[i]])
     }
   }
   
@@ -62,4 +82,9 @@ source_remote=function(repo,subdir,r.file,vcs='github',flag=TRUE){
   
   return(list.out)
   #End of function ----
+}
+
+strip.path=function(y){
+  str=strsplit(y,'[\\/]')[[1]]
+  str[length(str)]
 }
