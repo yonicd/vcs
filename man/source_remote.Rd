@@ -14,7 +14,7 @@ source_remote(repo, subdir, r.file, tokens = NULL, branch = "master",
 
 \item{r.file}{character, file name to source}
 
-\item{tokens}{character, vectors of functions names that will be have a path appended to them}
+\item{tokens}{character, vector of functions names that will be have a path appended to them}
 
 \item{branch}{character, alias of the branch in the repository, Default: 'master'}
 

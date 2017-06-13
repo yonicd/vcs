@@ -5,7 +5,7 @@
 #' @param branch character, alias of the branch in the repository, Default: 'master'
 #' @param subdir character, subdirectory of repository
 #' @param r.file character, file name to source
-#' @param tokens character, vectors of functions names that will be have a path appended to them
+#' @param tokens character, vector of functions names that will be have a path appended to them
 #' @param vcs character, choose which version control system to search (github, bitbucket), Default: 'github'
 #' @param flag boolean, checks to see if the file is a nested file Default: TRUE
 #' @examples 
@@ -18,6 +18,10 @@
 #' @export
 source_remote=function(repo,subdir,r.file,tokens=NULL,branch='master',vcs='github',flag=TRUE){
   
+  vcsdir <- file.path(tempdir(),'vcs')
+  if(!dir.exists(vcsdir)) dir.create(vcsdir)
+  on.exit({unlink(file.path(tempdir(),'vcs'))},add = TRUE)
+  
   if(vcs=='bitbucket') path=file.path('https://bitbucket.org',repo,'raw',branch,subdir)
   if(vcs=='github') path=file.path('https://raw.githubusercontent.com',repo,branch,subdir)
   
@@ -29,10 +33,10 @@ source_remote=function(repo,subdir,r.file,tokens=NULL,branch='master',vcs='githu
   
   tokens.str=paste0(tokens,'\\(')
   #tokens<-c('read','source',tokens.str)
-  tokens<-c('read','source')
+  tokens_base<-c('read','source')
   
   #Rewrite paths for source and read commands to url path ----
-  for(i in grep(paste0(tokens,collapse='|'),r.code)) r.code[i]=setwd_remote(r.code[i],repo,branch,subdir,vcs,tokens)
+  for(i in grep(paste0(tokens_base,collapse='|'),r.code)) r.code[i]=setwd_remote(r.code[i],repo,branch,subdir,vcs,vcsdir=vcsdir,vcsenv=environment(),tokens_add=tokens)
   token.find=which(grepl(tokens.str,r.code))
   to.unlink=rep(NA,length(token.find))
   
@@ -53,19 +57,23 @@ source_remote=function(repo,subdir,r.file,tokens=NULL,branch='master',vcs='githu
   if(length(token.find)>0){
     for(i in 1:length(token.find)){
       
+      r.code[token.find[i]]=gsub('\\"',"'",r.code[token.find[i]])
       str.old=regmatches(r.code[token.find[i]],regexpr("\\'(.*?)\\'", r.code[token.find[i]]))
-      str.change=basename(gsub("[\\']",'',str.old[1]))  
+      str.change=gsub("[\\']",'',str.old[1])
       file.name=basename(str.change)
       
-      ls.path=ls_remote(path=repo,branch = branch,subdir=subdir,vcs = vcs,full.names = TRUE)
+      ls.path=ls_remote(path=repo,branch = branch,
+                        subdir=ifelse(!is.null(dirname(str.change)),subdir),
+                        vcs = vcs,full.names = TRUE)
+      
       find.file=match(file.name,basename(ls.path))
       if(length(find.file)==0) stop(sprintf('%s not found in %s/%s'),file.name,repo,subdir)
       down.address=ls.path[find.file]
-      eval(parse(text=sprintf("%s<-tempfile(pattern = 'VCS_',fileext = tools::file_ext('%s'))",file.name,file.name)))
+      eval(parse(text=sprintf("%s<-tempfile(pattern = 'VCS_',tmpdir = vcsdir,fileext = tools::file_ext('%s'))",file.name,file.name)))
       eval(parse(text=sprintf("download.file('%s',%s,quiet = T,method='curl')",down.address,file.name)))
       message(str.change,' downloaded from ',down.address,' and placed in tempfile')
       to.unlink[i]=file.name
-      r.code[token.find[i]]=gsub(str.old,str.change,r.code[token.find[i]])
+      r.code[token.find[i]]=gsub(str.old,file.name,r.code[token.find[i]])
     }
   }
   
