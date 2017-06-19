@@ -48,7 +48,7 @@ grepr=function(pattern,path,recursive=FALSE,padding=0,...){
     if(vcs=='svn'){
       args$x=system(sprintf('svn cat %s',x),intern = TRUE)
     }else{
-      args$x=readLines(x,warn = FALSE) 
+      args$x=strsplit(httr::content(httr::GET(x)),'\\n')[[1]]
     }
     
     
