@@ -100,7 +100,7 @@ ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github',full
            }
            pathout <- s
            setwd(this_wd)
-           if(newdir) unlink(td, recursive=TRUE)
+           if(newdir) unlink(td)
          }
   )
   setwd(this_wd)
