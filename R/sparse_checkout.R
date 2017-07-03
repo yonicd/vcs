@@ -29,11 +29,11 @@ sparse_checkout<-function(repo_url,repo,dirs,create=TRUE,append=TRUE,remote='ori
   if(thisDir!=file.path(dirname(getwd()),repo)) setwd(repo)
   
   if(create){ 
-    
-    # New repository
-    
-    system('git init')
-    system(sprintf('git remote add -f %s %s',remote,repo_url))
+    if(!'.git'%in%dir(all.files = TRUE)){
+      # New repository
+      system('git init')
+      system(sprintf('git remote add -f %s %s',remote,repo_url))
+    }
     system('git config core.sparsecheckout true')
     cat(dirs,file = '.git/info/sparse-checkout',sep = '\n')
     fetch=sprintf("git fetch %s", remote)

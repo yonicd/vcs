@@ -33,7 +33,7 @@ grepr=function(pattern,path,recursive=FALSE,padding=0,...){
   list2env(grepVars,envir = environment())
   
   if(is.character(path)) fl=list.files(path,recursive = recursive,full.names = TRUE)
-  vcs='git'
+  vcs='local'
   
   if(is.list(path)){
     path$full.names=TRUE
@@ -45,12 +45,12 @@ grepr=function(pattern,path,recursive=FALSE,padding=0,...){
     args=grepVars
     args$pattern=pattern
     if(is.null(args$value)) args$value=FALSE
-    if(vcs=='svn'){
-      args$x=system(sprintf('svn cat %s',x),intern = TRUE)
-    }else{
-      args$x=strsplit(httr::content(httr::GET(x)),'\\n')[[1]]
-    }
     
+    args$x=switch(vcs,
+            local= {readLines(x,warn = FALSE)},
+            svn  = {system(sprintf('svn cat %s',x),intern = TRUE)},
+                   {strsplit(httr::content(httr::GET(x)),'\\n')[[1]]} #default
+           )
     
     if(padding>0&args$value){
       args0<-args
