@@ -4,15 +4,18 @@
 \alias{sparse_checkout}
 \title{Create a sparse git repository}
 \usage{
-sparse_checkout(repo_url, repo, dirs, create = TRUE, append = TRUE,
-  remote = "origin", branch = "master", depth = Inf)
+sparse_checkout(repo_url, dest.dir, queries, vcs = "git", create = TRUE,
+  append = TRUE, remote = "origin", branch = "master", depth = Inf,
+  svn.set.depth = "immediates")
 }
 \arguments{
 \item{repo_url}{character, repository url path}
 
-\item{repo}{character, path on local disk that repository is cloned to}
+\item{dest.dir}{character, path on local disk that repository is cloned to}
 
-\item{dirs}{character, vector of repository subdirectories to fetch}
+\item{queries}{character, vector of repository subdirectories to fetch}
+
+\item{vcs}{character, choose which version control system to checkout files from (git, svn) ,  Default: 'git'}
 
 \item{create}{boolean, create a new git clone?, Default: TRUE}
 
@@ -23,6 +26,8 @@ sparse_checkout(repo_url, repo, dirs, create = TRUE, append = TRUE,
 \item{branch}{character, alias of the branch, Default: 'master'}
 
 \item{depth}{integer, depth of revisions to checkout, Default: 1}
+
+\item{svn.set.depth}{character, parameter passed to svn update that controls the depth folders are updated to (see details) Default: 'immediates'}
 }
 \value{
 nothing
@@ -31,15 +36,20 @@ nothing
 Create a git repository from a version control system that fetches only specified subdirectories and file types, 
 can be used for github and bitbucket.
 }
+\details{
+Since bitbucket and github are both git version control systems only two options are needed for vcs, passing those values to vcs will default back to git.
+The parameters (create,remote, branch,depth) are used only when vcs=='git'. The possible values for svn.set.depth are c('files','immediates','infinity').
+For further documentaion see \url{http://svnbook.red-bean.com/en/1.7/svn.advanced.sparsedirs.html}.
+}
 \examples{
 \donttest{
 repo_url='https://github.com/tidyverse/ggplot2.git'
-repo='ggplot2-sparse'
-dirs=c('data-raw/*.csv','man/*.Rd')
+dest.dir='ggplot2-sparse'
+queries=c('data-raw/*.csv','man/*.Rd')
 #create new sparse clone
-sparse_checkout(repo_url,repo,dirs)
+sparse_checkout(repo_url,dest.dir,queries)
 
 #update sparse-checkout definitions (appends to current list)
-sparse_checkout(repo_url,repo,dirs=c('man/macros/*.Rd'),create=FALSE,append=TRUE)
+sparse_checkout(repo_url,dest.dir,queries=c('man/macros/*.Rd'),create=FALSE,append=TRUE)
 }
 }
