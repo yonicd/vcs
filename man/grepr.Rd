@@ -4,7 +4,8 @@
 \alias{grepr}
 \title{Recursive grep}
 \usage{
-grepr(pattern, path, recursive = FALSE, padding = 0, ...)
+grepr(pattern, path, recursive = FALSE, padding = 0, interactive = FALSE,
+  ...)
 }
 \arguments{
 \item{pattern}{character, string containing a regular expression}

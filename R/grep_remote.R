@@ -28,7 +28,7 @@
 #' padding=3,value=TRUE,fixed=TRUE)}
 #' @export
 #' @importFrom utils head tail
-grepr=function(pattern,path,recursive=FALSE,padding=0,...){
+grepr=function(pattern,path,recursive=FALSE,padding=0,interactive=FALSE,...){
   grepVars=list(...)
   list2env(grepVars,envir = environment())
   
@@ -44,7 +44,7 @@ grepr=function(pattern,path,recursive=FALSE,padding=0,...){
   out=sapply(fl,function(x){
     args=grepVars
     args$pattern=pattern
-    if(is.null(args$value)) args$value=FALSE
+    if(is.null(args$value)||interactive) args$value=FALSE
     
     args$x=switch(vcs,
             local= {readLines(x,warn = FALSE)},
@@ -73,6 +73,13 @@ grepr=function(pattern,path,recursive=FALSE,padding=0,...){
     } 
   })
   
-  out[sapply(out,length)>0]
+  if(interactive&vcs%in%c('github','bitbucket')){
+    s<-out[sapply(out,length)>0]
+    x<-vcs::ls_remote(path$path,full.names = TRUE)
+    jsTree(vcs::ls_remote(path$path),remote_repo = path$path,nodestate = x%in%names(s),preview.search = pattern)
+    
+  }else{
+    out[sapply(out,length)>0] 
+  }
   
 }
