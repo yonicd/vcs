@@ -27,7 +27,8 @@
 #'       path = list(path = 'timelyportfolio/vueR',subdir='R|inst',vcs='github'),
 #' padding=3,value=TRUE,fixed=TRUE)}
 #' @export
-#' @importFrom utils head tail
+#' @importFrom httr content GET
+#' @importFrom utils tail head
 grepr=function(pattern,path,recursive=FALSE,padding=0,interactive=FALSE,...){
   grepVars=list(...)
   list2env(grepVars,envir = environment())
@@ -75,8 +76,8 @@ grepr=function(pattern,path,recursive=FALSE,padding=0,interactive=FALSE,...){
   
   if(interactive&vcs%in%c('github','bitbucket')){
     s<-out[sapply(out,length)>0]
-    x<-vcs::ls_remote(path$path,full.names = TRUE)
-    jsTree(vcs::ls_remote(path$path),remote_repo = path$path,nodestate = x%in%names(s),preview.search = pattern)
+    x<-ls_remote(path$path,full.names = TRUE)
+    jsTree(ls_remote(path$path),remote_repo = path$path,nodestate = x%in%names(s),preview.search = pattern)
     
   }else{
     out[sapply(out,length)>0] 

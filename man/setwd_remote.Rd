@@ -10,11 +10,11 @@ setwd_remote(r.script.raw, repo, branch = "master", subdir, vcs = "github",
 \arguments{
 \item{r.script.raw}{character, script to append remote path.}
 
+\item{repo}{character, path to append}
+
 \item{tokens_base}{character, vector of base R functions names that will be have a path appended to them.}
 
 \item{tokens_add}{character, vector of functions names that will be have a path appended to them.}
-
-\item{path}{character, path to append}
 }
 \description{
 Appends to read and source calls URL path.

@@ -1,7 +1,7 @@
 #' @title Set the working directory to a Github repository URL address
 #' @description Appends to read and source calls URL path.
 #' @param r.script.raw character, script to append remote path.
-#' @param path character, path to append
+#' @param repo character, path to append
 #' @param tokens_base character, vector of base R functions names that will be have a path appended to them.
 #' @param tokens_add character, vector of functions names that will be have a path appended to them.
 #' @export
