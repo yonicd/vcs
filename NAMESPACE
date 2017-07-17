@@ -2,6 +2,7 @@
 
 export(collapse_pipe)
 export(diff_head)
+export(find.remote)
 export(grepr)
 export(list_repos)
 export(ls_remote)
