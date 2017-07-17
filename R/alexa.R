@@ -50,7 +50,7 @@ ui <- miniUI::miniPage(
       shiny::uiOutput('chosen')
     ),
     mainPanel = shiny::mainPanel(
-      jsTree::jsTreeOutput(outputId = 'tree',width = '100%',height = 800)                  
+      shiny::uiOutput('main')
     ))
   
 
@@ -96,9 +96,9 @@ server <- function(input, output,session) {
                               opts=NULL
                               if(!is.null(input$f1)){
                               if(dir.exists(input$f1)){
-                                opts=list(nodestate=diff_head(input$f1,vcs=vcs_type,show = FALSE))
+                                opts=list(nodestate=diff_head(isolate(input$f1),vcs=vcs_type,show = FALSE))
                               }
-                              navigate_remote(input$f1,vcs=vcs_type,output.opts = opts)
+                              navigate_remote(isolate(input$f1),vcs=vcs_type,output.opts = opts)
                               }
                             })
                           },
@@ -112,9 +112,16 @@ server <- function(input, output,session) {
     
   })
   
-  shiny::observeEvent(c(input$queryRepo,input$dirType),{
-    
+  shiny::observeEvent(input$f1,{
+    output$main<-shiny::renderUI({
+      if(dir.exists(input$f1)){
+        jsTree::jsTreeOutput(outputId = 'tree',width = '100%',height = 800)
+      }else{
+        p('Directory Not Found') 
+      }
+    })   
   })
+ 
   
   
   shiny::observeEvent(c(input$createRepo),{
