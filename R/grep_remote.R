@@ -50,7 +50,13 @@ grepr=function(pattern,path,recursive=FALSE,padding=0,interactive=FALSE,...){
     args$x=switch(vcs,
             local= {readLines(x,warn = FALSE)},
             svn  = {system(sprintf('svn cat %s',x),intern = TRUE)},
-                   {strsplit(httr::content(httr::GET(x)),'\\n')[[1]]} #default
+                   { s<-httr::content(httr::GET(x))
+                     if(length(s)>0){
+                       strsplit(s,'\\n')[[1]]
+                     }else{
+                       c('')
+                     } 
+                     } #default
            )
     
     if(padding>0&args$value){

@@ -27,7 +27,7 @@
 #' @importFrom shiny sidebarLayout sidebarPanel radioButtons conditionalPanel wellPanel textInput uiOutput actionButton reactiveValues observeEvent renderPrint eventReactive isolate renderUI verbatimTextOutput selectInput stopApp runGadget paneViewer
 sasha<-function(rootpath=getwd()){
 ui <- miniUI::miniPage(
-  miniUI::gadgetTitleBar('Sasha',
+  miniUI::gadgetTitleBar('SASHA',
                          left = miniUI::miniTitleBarButton(inputId = "qt","Quit",primary = TRUE),
                          right=NULL),
   miniUI::miniContentPanel(
@@ -37,7 +37,8 @@ ui <- miniUI::miniPage(
                              shiny::conditionalPanel("input.dirType=='Local'",{
                                shiny::wellPanel(
                                  shiny::textInput(inputId = 'localPath',label = 'Root Directory',placeholder = 'Enter Root Directory',value = rootpath),
-                                 shiny::uiOutput('localDir'))  
+                                 shiny::uiOutput('localDir'),
+                                 shiny::actionButton('updateRepo','Update Checkout'))  
       }),
       shiny::conditionalPanel("input.dirType=='Remote'",{
         shiny::wellPanel(
@@ -124,25 +125,72 @@ server <- function(input, output,session) {
  
   shiny::observeEvent(c(input$createRepo),{
     if(!is.null(input$f1)){
-      f2<-gsub(sprintf('%s/%s',input$f1,'master'),'',network$tree)
-      if(length(f2)>0){
-        if(dir.exists(sprintf('%s/.git',input$dirOutput))){
-          sparse_checkout(repo_url = sprintf('https://github.com/%s.git',input$remotePath),
-                               vcs = input$vcs,
-                               queries = f2,
-                               dest.dir = input$dirOutput,
-                               create = FALSE,
-                               append = FALSE)
-        }else{
-          sparse_checkout(repo_url = sprintf('https://github.com/%s.git',input$remotePath),
-                               vcs = input$vcs,
-                               queries = f2,
+      switch(input$vcs,
+           github={
+             repo_url<-sprintf('https://github.com/%s.git',input$remotePath)
+             f2<-gsub(sprintf('%s/%s',input$f1,'master'),'',network$tree)
+             queries<-gsub('^(.*?)master/','',f2)
+             this.vcs<-'git'
+           },
+           bitbucket={
+             repo_url<-sprintf('https://bitbucket.com/%s.git',input$remotePath)
+             f2<-gsub(sprintf('%s/%s',input$f1,'master'),'',network$tree)
+             queries<-gsub('^(.*?)master/','',f2)
+             this.vcs<-'git'
+           },
+           svn={
+             repo_url<-sprintf('svn+ssh://%s',input$remotePath)
+             f2<-gsub(sprintf('%s/%s',input$f1,'master'),'',network$tree)
+             this.vcs<-'svn'
+           })
+        
+        # if(dir.exists(sprintf('%s/.git',input$dirOutput))){
+        #   sparse_checkout(repo_url = repo_url,
+        #                        vcs = this.vcs,
+        #                        queries = queries,
+        #                        dest.dir = input$dirOutput,
+        #                        create = FALSE,
+        #                        append = FALSE)
+        # }else{
+          sparse_checkout(repo_url = repo_url,
+                               vcs = this.vcs,
+                               queries = queries,
                                dest.dir = input$dirOutput,
                                create = TRUE)
-        }
-      } 
+        #}
+       
     }
   })
+  
+  shiny::observeEvent(c(input$updateRepo),{
+    
+    rc<-remote.current()
+    this.vcs=rc[rc$dir==input$f1,'vcs']
+    if(!is.null(input$f1)){
+      switch(this.vcs,
+             git={
+               repo_url<-sprintf('https://github.com/%s.git',input$remotePath)
+               f2<-gsub(sprintf('%s/%s',input$f1,'master'),'',network$tree)
+               queries<-gsub('^(.*?)master/','',f2)
+               this.vcs<-'git'
+             },
+             svn={
+               repo_url<-sprintf('svn+ssh://%s',input$remotePath)
+               f2<-gsub(sprintf('%s/%s',input$f1,'master'),'',network$tree)
+               this.vcs<-'svn'
+             })
+      if(dir.exists(sprintf('%s/.%s',input$f1,this.vcs))){
+        sparse_checkout(repo_url = repo_url,
+                             vcs = this.vcs,
+                             queries = queries,
+                             dest.dir = input$f1,
+                             create = FALSE,
+                             append = FALSE)
+      }
+      
+    }
+  })
+  
   
   output$chosen=shiny::renderUI({
     shiny::verbatimTextOutput(outputId = "results")
