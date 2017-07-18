@@ -6,7 +6,7 @@
 #' @examples 
 #' \dontrun{
 #' if(interactive()){
-#'  alexa(getwd())
+#'  sasha(getwd())
 #'  }
 #' }
 #' @seealso 
@@ -19,15 +19,15 @@
 #'  \code{\link[shiny]{sidebarLayout}},\code{\link[shiny]{sidebarPanel}},\code{\link[shiny]{radioButtons}},\code{\link[shiny]{conditionalPanel}},\code{\link[shiny]{wellPanel}},\code{\link[shiny]{textInput}},\code{\link[shiny]{uiOutput}},\code{\link[shiny]{actionButton}},\code{\link[shiny]{reactiveValues}},\code{\link[shiny]{observeEvent}},\code{\link[shiny]{renderPrint}},\code{\link[shiny]{eventReactive}},\code{\link[shiny]{isolate}},\code{\link[shiny]{renderUI}},\code{\link[shiny]{verbatimTextOutput}},\code{\link[shiny]{selectInput}},\code{\link[shiny]{stopApp}},\code{\link[shiny]{runGadget}},\code{\link[shiny]{paneViewer}}
 
 #'  \code{\link[vcs]{find.remote}},\code{\link[vcs]{diff_head}},\code{\link[vcs]{navigate_remote}},\code{\link[vcs]{sparse_checkout}}
-#' @rdname alexa
+#' @rdname sasha
 #' @export 
 #' @importFrom jsonlite fromJSON
 #' @importFrom jsTree jsTreeOutput renderJsTree
 #' @importFrom miniUI miniPage gadgetTitleBar miniTitleBarButton miniContentPanel
 #' @importFrom shiny sidebarLayout sidebarPanel radioButtons conditionalPanel wellPanel textInput uiOutput actionButton reactiveValues observeEvent renderPrint eventReactive isolate renderUI verbatimTextOutput selectInput stopApp runGadget paneViewer
-alexa<-function(rootpath=getwd()){
+sasha<-function(rootpath=getwd()){
 ui <- miniUI::miniPage(
-  miniUI::gadgetTitleBar('Alexa',
+  miniUI::gadgetTitleBar('Sasha',
                          left = miniUI::miniTitleBarButton(inputId = "qt","Quit",primary = TRUE),
                          right=NULL),
   miniUI::miniContentPanel(
