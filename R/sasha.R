@@ -122,20 +122,20 @@ server <- function(input, output,session) {
     })   
   })
  
-  
-  
   shiny::observeEvent(c(input$createRepo),{
     if(!is.null(input$f1)){
       f2<-gsub(sprintf('%s/%s',input$f1,'master'),'',network$tree)
       if(length(f2)>0){
         if(dir.exists(sprintf('%s/.git',input$dirOutput))){
-          sparse_checkout(repo_url = sprintf('https://github.com/%s.git',input$f1),
+          sparse_checkout(repo_url = sprintf('https://github.com/%s.git',input$remotePath),
+                               vcs = input$vcs,
                                queries = f2,
                                dest.dir = input$dirOutput,
                                create = FALSE,
                                append = FALSE)
         }else{
-          sparse_checkout(repo_url = sprintf('https://github.com/%s.git',input$f1),
+          sparse_checkout(repo_url = sprintf('https://github.com/%s.git',input$remotePath),
+                               vcs = input$vcs,
                                queries = f2,
                                dest.dir = input$dirOutput,
                                create = TRUE)
