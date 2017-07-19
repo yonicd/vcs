@@ -53,7 +53,7 @@ Let Sasha help you control your version control repositories both on your checko
     - Search within previewed file for text
     - Select files to create (sparse) checkout and check them out to local path of choice
 
-![](https://github.com/yonicd/jsTree/blob/master/Miscellaneous/sasha.gif?raw=true)
+![](https://github.com/yonicd/vcs/blob/master/Miscellaneous/sasha.gif?raw=true)
 
 ### *Limitations
 
