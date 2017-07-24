@@ -1,0 +1,108 @@
+---
+title: "VCS"
+output: html_document
+---
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+library(dplyr)
+library(d3Tree)
+df<-data.frame(v1=c('local','local',rep('remote',3)),
+               v2=c('git','svn','git','git','svn'),
+               v3=c(NA,NA,'Bitbucket','Github',NA),
+               v4=NA,
+               stringsAsFactors = FALSE)
+
+df2<-data.frame(v1=c(rep('passive',12),rep('active',12)),
+               v2=c(rep('CLI',6),rep('GUI',6),rep('CLI',6),rep('GUI',6)),
+               v3=c('grepr','list_repos','ls_remote','diff_head','setwd_remote','source_remote',
+                           'interactive_grepr',NA,'navigate_remote',rep(NA,3),
+                           'sparse_checkout','update_depth',rep(NA,4),'sasha',rep(NA,5)),
+               v4=NA,
+               stringsAsFactors = FALSE)%>%filter(!is.na(v2)&!is.na(v3))
+```
+
+
+The premise of the vcs package is to give a single interface with a number of version control systems for an R user. The user can maintain and interact with repositories on svn and git systems on their local and remote systems. 
+
+```{r,echo=FALSE}
+d3Tree::d3tree(data = list(root = d3Tree::df2tree(rootname = 'vcs',struct = df),layout = 'collapse'))
+```
+
+The functionalities can be split into two major groups:
+
+  - Passive inquiry where the user does not need a local checkout and can inspect the remote repository from within R.
+  - Active maintenance where the user can define a specific checkout and then manage it. 
+  
+Two types of users were taken into account when writing the package, users that are comfortable with command line (CLI) calls and new R users that need a graphical user interface (GUI) to help them run the functions. The GUI that the package uses depends heavily on another R package that was written to compliment it, [jsTree](https://github.com/metrumresearchgroup/jsTree).
+
+```{r,echo=FALSE}
+d3Tree::d3tree(data = list(root = d3Tree::df2tree(rootname = 'vcs',struct = df2),layout = 'collapse'))
+```
+
+## Functions
+
+### Passive Inquiry
+
+#### CLI
+  - **grepr**: run recursive grep directly on local paths and remote branches
+  - **list_repos**: list repositories of a user in a version control repository
+  - **ls_remote**: list files on remote branches on a version control repository
+  - **diff_head**: query the difference in files between current fetch and the HEAD of a repository
+  - **setwd_remote**: replace inline script from local path to remote path
+  - **source_remote**: source script on remote branches, works for reading in data on remote and nested sourcing
+  
+#### GUI
+  - **navigate_remote**
+    - visualize the structure of a remote branch prior to cloning/forking
+
+```{r,results='asis'}
+
+#local
+
+vcs::navigate_remote(path = '~/projects/vcs',vcs = 'git')
+
+
+#remote
+
+vcs::navigate_remote(path = 'metrumresearchgroup/mrgsolve',vcs = 'github')
+
+vcs::navigate_remote(path = 'metrumrg/qapply',vcs = 'bitbucket')
+
+```
+
+  - **Interactive grepr**
+    - Run recursive grep directly on remote branches of Github/Bitbucket/SVN and inspect the results using an interactive UI.
+    - Preview text files in the branch without needing to checkout (Github/BitBucket only)
+    - The search term inputed will be used in the preview in a search textbox to highlight the term in document. The user can then continue and use the search box to search for other terms int he text. 
+
+![](https://github.com/yonicd/jsTree/blob/master/Miscellaneous/jstree_vcs_grepr.gif?raw=true)
+  
+  
+### Active maintenance
+
+#### CLI
+  - **sparse_checkout**: create a sparse checkout of a repository on github/bitbucket/svn
+  - **update_depth**: if the git repository was checked out with a depth setting, use this function to update or cancel the depth setting
+  
+#### GUI
+ - **sasha**: Alexa for R!
+
+Control your version control repositories both on your checkouts and on the master. Just point Sasha to a root path where the repositories are set and the rest is done for you. 
+
+  - Toggle between local checkouts and remote repos
+  
+  - Local
+  
+    - Auto recognition of svn and git parent folders
+    - Checks to see what the current (sparse) checkout is compared to HEAD
+    - Users can update the definitions of the (sparse) checkout through the GUI
+    
+  - Remote
+    - Navigate to any online repository on Github, Bitbucket or SVN
+    - View the structure of a branch in the repo
+    - Preview* text files in the branch without needing to checkout (Github/BitBucket only)
+    - Search within previewed file for text
+    - Select files to create (sparse) checkout and check them out to local path of choice
+
+![](https://github.com/yonicd/vcs/blob/master/Miscellaneous/sasha.gif?raw=true)
+  
