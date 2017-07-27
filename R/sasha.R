@@ -139,8 +139,9 @@ server <- function(input, output,session) {
              this.vcs<-'git'
            },
            svn={
-             repo_url<-sprintf('svn+ssh://%s',input$remotePath)
+             repo_url<-input$remotePath
              f2<-gsub(sprintf('%s/%s',input$f1,'master'),'',network$tree)
+             queries <- gsub(sprintf('^(.*?)%s/',basename(repo_url)),'',network$tree)
              this.vcs<-'svn'
            })
         
@@ -175,8 +176,9 @@ server <- function(input, output,session) {
                this.vcs<-'git'
              },
              svn={
-               repo_url<-sprintf('svn+ssh://%s',input$remotePath)
+               repo_url<-input$remotePath
                f2<-gsub(sprintf('%s/%s',input$f1,'master'),'',network$tree)
+               queries <- gsub(sprintf('^(.*?)%s/',basename(repo_url)),'',network$tree)
                this.vcs<-'svn'
              })
       if(dir.exists(sprintf('%s/.%s',input$f1,this.vcs))){
