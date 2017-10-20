@@ -5,7 +5,7 @@
 \title{Visually inspect structure of git repository before initial fetch}
 \usage{
 navigate_remote(path = getwd(), branch = "master", vcs = "github",
-  output = "jsTree", output.opts = list())
+  output.opts = list())
 }
 \arguments{
 \item{path}{character, Path to root directory of git repository or a name of a github/bitbucket repository, Default: setwd()}
@@ -13,9 +13,6 @@ navigate_remote(path = getwd(), branch = "master", vcs = "github",
 \item{branch}{character, alias of the github/bitbucket branch to retrieve directory structure, Default: 'master'}
 
 \item{vcs}{character, choose which version control system to search (github, bitbucket, git (head of checkout repo), svn), Default: 'github'}
-
-\item{output}{character, htmlwidget function to send the output of the \code{\link{ls_remote}}, 
-options to visualize are jsTree and d3Tree.}
 
 \item{output.opts}{parameters to pass to the output function}
 }
@@ -34,6 +31,5 @@ navigate_remote('tidyverse/glue')
 navigate_remote('tidyverse/glue',branch='named_args')
 }
 \seealso{
-\code{\link[d3Tree]{d3tree}}
- \code{\link[jsTree]{jsTree}}
+\code{\link[jsTree]{jsTree}}
 }

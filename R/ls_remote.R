@@ -21,14 +21,26 @@
 #'    #'master' branch
 #'     ls_remote('metrumrg/qapply',vcs='bitbucket')
 #' 
-ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github',full.names=FALSE){
+ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github', full.names=FALSE){
   this_wd <- getwd()
   switch(vcs,
          github={
-           uri_git <- sprintf('https://github.com/%s.git',path)
+           
+           myPAT <- Sys.getenv('GITHUB_PAT')
+           
+           uri_git <- sprintf('https://api.github.com/repos/%s',path)
+           get_git <- sprintf('https://api.github.com/repos/%s/git/trees/%s%s',path,branch,'?recursive=1')
+           
+           if(nzchar(myPAT)){
+             uri_git <- sprintf('%s?access_token=%s',uri_git,Sys.getenv('GITHUB_PAT'))
+             get_git <- sprintf('%s&access_token=%s',get_git,Sys.getenv('GITHUB_PAT'))
+             }
+           
            chk_git <- httr::http_error(uri_git)
-           if(chk_git) stop(sprintf("repo: %s not found", uri_git))
-           tr <- httr::content(httr::GET(sprintf('https://api.github.com/repos/%s/git/trees/%s%s',path,branch,'?recursive=1')))$tree
+           
+           if(chk_git) stop(sprintf("repo: https://github.com/%s not found", path))
+
+           tr <- httr::content(httr::GET(get_git))$tree
            s <- sapply(tr,function(x) if(x$mode!='040000') x$path)
            s <- unlist(s)
            if(!is.null(subdir)){
@@ -38,7 +50,19 @@ ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github',full
                s=grep(paste0('^',subdir,'(.*?)/'),s,value=TRUE)   
              }
            }
-           if(full.names) s=sprintf('https://raw.githubusercontent.com/%s/%s/%s',path,branch,s) 
+           
+           if(full.names){ 
+             
+              raw_git <- sprintf('https://raw.githubusercontent.com/%s/%s/%s',path,branch,s) 
+             
+              if(nzchar(myPAT)){
+               dlPAT <- gsub('^(.*?)\\?','',httr::content(httr::GET(sprintf('https://api.github.com/repos/%s/contents/%s?access_token=%s',path,s[1],myPAT)))$download_url)
+               raw_git <- sprintf('%s?%s',raw_git,dlPAT)
+              }
+           
+              s <- raw_git
+           }
+           
            pathout <- s
          },
          bitbucket={
