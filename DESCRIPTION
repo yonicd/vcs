@@ -1,8 +1,8 @@
 Package: vcs
 Type: Package
 Title: Managing, Inspecting and Sourcing Remote Repositories on a Version Control System
-Version: 0.1.0
-Date: 2017-06-08
+Version: 0.1.1
+Date: 2018-05-10
 Author: Jonathan Sidi [aut, cre]
 Maintainer: Jonathan Sidi <yonis@metrumrg.com>
 Description: Managing, inspecting and sourcing remote repositories such as github, bitbucket and subversion without the need to clone
@@ -16,4 +16,4 @@ BugReports: https://github.com/yonicd/remote/issues
 LazyData: true
 NeedsCompilation: no
 Packaged: 2017-06-08 14:00:00 UTC; Yoni
-RoxygenNote: 6.0.1
+RoxygenNote: 6.0.1.9000

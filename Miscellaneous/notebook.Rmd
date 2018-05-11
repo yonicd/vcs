@@ -4,8 +4,7 @@ output: html_document
 ---
 
 ```{r,echo=FALSE,message=FALSE,warning=FALSE}
-library(dplyr)
-library(d3Tree)
+library(vcs)
 df<-data.frame(v1=c('local','local',rep('remote',3)),
                v2=c('git','svn','git','git','svn'),
                v3=c(NA,NA,'Bitbucket','Github',NA),
@@ -18,7 +17,9 @@ df2<-data.frame(v1=c(rep('passive',12),rep('active',12)),
                            'interactive_grepr',NA,'navigate_remote',rep(NA,3),
                            'sparse_checkout','update_depth',rep(NA,4),'sasha',rep(NA,5)),
                v4=NA,
-               stringsAsFactors = FALSE)%>%filter(!is.na(v2)&!is.na(v3))
+               stringsAsFactors = FALSE)
+
+df2 <- df2[!is.na(df2$v2)&!is.na(df2$v3),]
 ```
 
 
@@ -44,22 +45,72 @@ d3Tree::d3tree(data = list(root = d3Tree::df2tree(rootname = 'vcs',struct = df2)
 ### Passive Inquiry
 
 #### CLI
-  - **grepr**: run recursive grep directly on local paths and remote branches
-  - **list_repos**: list repositories of a user in a version control repository
-  - **ls_remote**: list files on remote branches on a version control repository
-  - **diff_head**: query the difference in files between current fetch and the HEAD of a repository
-  - **setwd_remote**: replace inline script from local path to remote path
-  - **source_remote**: source script on remote branches, works for reading in data on remote and nested sourcing
+
+**ls_remote**: list files on remote branches on a version control repository
+
+```{r,eval=FALSE}
+vcs::ls_remote(path = 'metrumresearchgroup/mrgsolve',vcs = 'github')
+
+vcs::ls_remote(path = 'metrumresearchgroup/mrgsolve',vcs = 'github',subdir = 'R')
+
+vcs::ls_remote(path = 'metrumresearchgroup/mrgsolve',vcs = 'github',subdir = 'R',full.names = TRUE)
+
+vcs::ls_remote(path = 'metrumresearchgroup/mrgsolve',vcs = 'github',subdir = 'R|inst')
+
+vcs::ls_remote(path = 'metrumrg/qapply',vcs = 'bitbucket')
+
+#vcs::ls_remote(path = 'svn+ssh://jonathans@mc1.metrumrg.com/common/repo/svn-proj-SAN1601',vcs = 'svn',subdir='script/projPkg')
+```
+
+**list_repos**: list repositories of a user in a version control repository (git repos only)
+
+```{r}
+list_repos('metrumrg',vcs='bitbucket',fields='full_name')
+```
+
+**grepr**: run recursive grep directly on local paths and remote branches
+
+```{r,warning=FALSE}
+grepr('github',path = '..',recursive = TRUE)
+
+grepr('github',path = '..',recursive = FALSE)
+
+grepr('github',path = '../R',value=TRUE)
+
+grepr('github',path = '../R',value=TRUE,padding=3)
+
+#vcs::ls_remote(path = 'metrumresearchgroup/vcs',vcs = 'github',subdir='R')
+
+grepr('dirname',path = list(path = 'metrumresearchgroup/vcs',vcs = 'github',subdir='R'),value=TRUE,padding=3)
+
+#grepr('qapply',path = list(path = 'svn+ssh://jonathans@mc1.metrumrg.com/common/repo/svn-proj-SAN1601',vcs = 'svn',subdir='script/projPkg/R'))
+```
+
+
+**diff_head**: query the difference in files between current fetch and the HEAD of a repository
+  
+```{r}
+
+dir("../../ggplot2-sparse",recursive = TRUE)
+
+diff_head(path = "../../ggplot2-sparse", vcs = "git")
+
+```
+
+**source_remote**: source script on remote branches, works for reading in data on remote and nested sourcing
+This is pretty heavy and we've seen this applied in d3Tree on github and it has been successfully tested on NONR in bitbucket. 
+
+
   
 #### GUI
   - **navigate_remote**
     - visualize the structure of a remote branch prior to cloning/forking
 
-```{r,results='asis'}
+```{r,results='asis',eval=FALSE}
 
 #local
 
-vcs::navigate_remote(path = '~/projects/vcs',vcs = 'git')
+vcs::navigate_remote(path = '..',vcs = 'git')
 
 
 #remote
@@ -68,12 +119,21 @@ vcs::navigate_remote(path = 'metrumresearchgroup/mrgsolve',vcs = 'github')
 
 vcs::navigate_remote(path = 'metrumrg/qapply',vcs = 'bitbucket')
 
+#vcs::navigate_remote(path = 'svn+ssh://jonathans@mc1.metrumrg.com/common/repo/svn-proj-SAN1601',vcs = 'svn')
+
+#using diff_head to visualize the difference between what is checked out and the HEAD
+vcs::navigate_remote(path = '../../ggplot2-sparse',vcs = 'git',output.opts = list(nodestate=diff_head(path = "../../ggplot2-sparse", vcs = "git",show = FALSE)))
+
 ```
 
-  - **Interactive grepr**
-    - Run recursive grep directly on remote branches of Github/Bitbucket/SVN and inspect the results using an interactive UI.
-    - Preview text files in the branch without needing to checkout (Github/BitBucket only)
-    - The search term inputed will be used in the preview in a search textbox to highlight the term in document. The user can then continue and use the search box to search for other terms int he text. 
+**Interactive grepr**
+  - Run recursive grep directly on remote branches of Github/Bitbucket/SVN and inspect the results using an interactive UI.
+  - Preview text files in the branch without needing to checkout (Github/BitBucket only)
+  - The search term inputed will be used in the preview in a search textbox to highlight the term in document. The user can then continue and use the search box to search for other terms int he text. 
+
+```{r}
+vcs::grepr('dirname',path = list(path = 'metrumresearchgroup/vcs',vcs = 'github',subdir='R'),interactive=TRUE)
+```
 
 ![](https://github.com/yonicd/jsTree/blob/master/Miscellaneous/jstree_vcs_grepr.gif?raw=true)
   
@@ -81,8 +141,35 @@ vcs::navigate_remote(path = 'metrumrg/qapply',vcs = 'bitbucket')
 ### Active maintenance
 
 #### CLI
-  - **sparse_checkout**: create a sparse checkout of a repository on github/bitbucket/svn
-  - **update_depth**: if the git repository was checked out with a depth setting, use this function to update or cancel the depth setting
+
+**sparse_checkout**: create a sparse checkout of a repository on github/bitbucket/svn
+
+Not all repositories are R packages, and you want a part of the repo to checkout and not all the files. sparse_checkout lets you specify what files you are pulling and tracking from the remote to you checkout. The user can also control how many revisions to track (depth) and this can be updated after the initial checkout.
+
+
+```{r,eval=FALSE}
+repo_url <- 'https://github.com/tidyverse/ggplot2.git'
+dest.dir <- '~/projects/ggplot2-sparse'
+queries <- c('data-raw/*.csv','man/*.Rd')
+
+#create new sparse clone
+sparse_checkout(repo_url = repo_url,dest.dir = dest.dir,queries = queries)
+
+#update sparse-checkout definitions (appends to current list)
+sparse_checkout(repo_url = repo_url,dest.dir = dest.dir,queries=c('man/macros/*.Rd'),create=FALSE,append=TRUE)
+
+repo_url <- 'svn+ssh://jonathans@mc1.metrumrg.com/common/repo/svn-proj-SAN1601'
+dest.dir <- 'sparse-svn'
+queries <- c('script/scenarios/*.pdf')
+sparse_checkout(repo_url = repo_url,dest.dir = dest.dir,queries = queries,vcs = 'svn')
+
+```
+
+**update_depth**: if the git repository was checked out with a depth setting, use this function to update or cancel the depth setting
+  
+```{r,eval=FALSE}
+update_depth('../../ggplot2-sparse',action = 'deepen',action_input = 1)
+```
   
 #### GUI
  - **sasha**: Alexa for R!
@@ -103,6 +190,10 @@ Control your version control repositories both on your checkouts and on the mast
     - Preview* text files in the branch without needing to checkout (Github/BitBucket only)
     - Search within previewed file for text
     - Select files to create (sparse) checkout and check them out to local path of choice
+
+```{r,eval=FALSE}
+vcs::sasha()
+```
 
 ![](https://github.com/yonicd/vcs/blob/master/Miscellaneous/sasha.gif?raw=true)
   
