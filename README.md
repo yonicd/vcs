@@ -11,6 +11,7 @@ devtools::install_github('metrumresearchgroup/vcs')
 
 ### Functionalities that do not need a clone
   - **grepr**: run recursive grep directly on local paths and remote branches
+  - **gsubr**: run recursive gsub directly on local paths
   - **list_repos**: list repositories of a user in a version control repository
   - **ls_remote**: list files on remote branches on a version control repository
   - **navigate_remote**: visualize the structure of a remote branch prior to cloning/forking
