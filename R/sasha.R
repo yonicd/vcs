@@ -96,10 +96,17 @@ server <- function(input, output,session) {
                               vcs_type=rc[rc$dir==input$f1,'vcs']
                               opts=NULL
                               if(!is.null(input$f1)){
+                                
+                                tree <- navigate_remote(isolate(input$f1),vcs=vcs_type, show = FALSE)
+                                
                               if(dir.exists(input$f1)){
-                                opts=list(nodestate=diff_head(isolate(input$f1),vcs=vcs_type,show = FALSE))
+                                
+                                tree$current_nodestate <- diff_head(isolate(input$f1))
+                                
                               }
-                              navigate_remote(isolate(input$f1),vcs=vcs_type,output.opts = opts)
+                              
+                                tree$show()
+                                
                               }
                             })
                           },

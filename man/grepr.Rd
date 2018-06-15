@@ -4,17 +4,21 @@
 \alias{grepr}
 \title{Recursive grep}
 \usage{
-grepr(pattern, path, recursive = FALSE, padding = 0, interactive = FALSE,
-  ...)
+grepr(pattern, path, recursive = FALSE, whole_word = FALSE, padding = 0,
+  use_crayon = TRUE, interactive = FALSE, ...)
 }
 \arguments{
 \item{pattern}{character, string containing a regular expression}
 
 \item{path}{character, path to search, see details}
 
-\item{recursive}{logical, Should the listing recurse into directories? passed to list.files, Default: FALSE}
+\item{recursive}{boolean, Should the listing recurse into directories? passed to list.files, Default: FALSE}
+
+\item{whole_word}{boolean, if TRUE then the pattern will be wrapped with \\bpattern\\b internally, Default: FALSE}
 
 \item{padding}{integer, number of rows to return in addition to the query line, Default: 5}
+
+\item{use_crayon}{boolean, use crayon colors in console output, Default: TRUE}
 
 \item{...}{arguments passed to grep}
 }

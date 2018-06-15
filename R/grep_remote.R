@@ -2,8 +2,10 @@
 #' @description Recursive call to grep in R
 #' @param pattern   character, string containing a regular expression
 #' @param path      character, path to search, see details
-#' @param recursive logical, Should the listing recurse into directories? passed to list.files, Default: FALSE
+#' @param recursive boolean, Should the listing recurse into directories? passed to list.files, Default: FALSE
+#' @param whole_word boolean, if TRUE then the pattern will be wrapped with \\bpattern\\b internally, Default: FALSE
 #' @param padding   integer, number of rows to return in addition to the query line, Default: 5
+#' @param use_crayon boolean, use crayon colors in console output, Default: TRUE
 #' @param ...       arguments passed to grep
 #' @return grepr(value = FALSE) returns a vector of the indices of the elements of x 
 #' that yielded a match (or not, for invert = TRUE. 
@@ -29,17 +31,30 @@
 #' @export
 #' @importFrom httr content GET
 #' @importFrom utils tail head
-grepr=function(pattern,path,recursive=FALSE,padding=0,interactive=FALSE,...){
+#' @importFrom crayon green red
+#' @importFrom jsTree jsTree
+grepr=function(pattern,path,recursive=FALSE, whole_word = FALSE, padding=0,use_crayon = TRUE, interactive=FALSE, ...){
+
+  if(whole_word)
+    pattern <- sprintf('\\b%s\\b',pattern)
+    
   grepVars=list(...)
+  
   list2env(grepVars,envir = environment())
   
   if(is.character(path)) fl=list.files(path,recursive = recursive,full.names = TRUE)
   vcs='local'
   
   if(is.list(path)){
-    path$full.names=TRUE
+    
+    path$full.names <- TRUE
+    
+    if(is.null(path$branch))
+      path$branch <- 'master'
+    
     fl=do.call(ls_remote,path)
-    vcs=path$vcs
+    
+    vcs <- path$vcs
   } 
 
   out=sapply(fl,function(x){
@@ -71,8 +86,14 @@ grepr=function(pattern,path,recursive=FALSE,padding=0,interactive=FALSE,...){
         } 
         gdx=sapply(g,function(x,pad,nmax) seq(from=pmax(1,x-pad),to=pmin(nmax,x+pad)),pad=padding,nmax=length(args$x))
         out=unique(unlist(sapply(gdx,function(i){
-              ifelse(i%in%g0,sprintf('[row %s]: %s',i,args$x[i]),sprintf('row %s: %s',i,args$x[i]))
-            })))
+          if(use_crayon&!interactive){
+            ifelse(i%in%g0,sprintf('row %s: %s',i,crayon::green(gsub(pattern,crayon::red(regmatches(args$x[i], regexpr(pattern, args$x[i]))),args$x[i]))),sprintf('row %s: %s',i,args$x[i]))  
+          }else{
+            ifelse(i%in%g0,sprintf('[row %s]: %s',i,args$x[i]),sprintf('row %s: %s',i,args$x[i]))            
+          }
+        })
+        )
+      )
         
       }
     }else{
@@ -80,13 +101,28 @@ grepr=function(pattern,path,recursive=FALSE,padding=0,interactive=FALSE,...){
     } 
   })
   
-  if(interactive&vcs%in%c('github','bitbucket')){
-    s<-out[sapply(out,length)>0]
-    x<-ls_remote(path$path,full.names = TRUE)
-    jsTree(ls_remote(path$path),remote_repo = path$path,nodestate = x%in%names(s),preview.search = pattern)
+  if(interactive & vcs%in%c('github','bitbucket') ){
+    
+    s0 <- out[sapply(out,length)>0]
+
+    NAMES <- gsub(sprintf('^(.*?)%s/|\\?(.*?)$',path$branch),'',names(s0))
+    
+    tree <- jsTree::jsTree$new(ls_remote(path$path))
+    
+    tree$current_nodestate <- tree$data%in%NAMES
+    tree$add_vcs(remote_repo = path$path,vcs = vcs,remote_branch = 'master')
+    tree$preview_search <- pattern
+    
+    tree$show()
     
   }else{
-    out[sapply(out,length)>0] 
+    out <- out[sapply(out,length)>0]
+    
+    ret <- lapply(names(out),function(x){
+      cat(sprintf('\n%s\n',x), out[[x]], sep ='\n')
+    })
+    
+    invisible(out)
   }
   
 }

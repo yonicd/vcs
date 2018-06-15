@@ -5,7 +5,7 @@
 \title{Visually inspect structure of git repository before initial fetch}
 \usage{
 navigate_remote(path = getwd(), branch = "master", vcs = "github",
-  output.opts = list())
+  show = TRUE)
 }
 \arguments{
 \item{path}{character, Path to root directory of git repository or a name of a github/bitbucket repository, Default: setwd()}
@@ -13,11 +13,9 @@ navigate_remote(path = getwd(), branch = "master", vcs = "github",
 \item{branch}{character, alias of the github/bitbucket branch to retrieve directory structure, Default: 'master'}
 
 \item{vcs}{character, choose which version control system to search (github, bitbucket, git (head of checkout repo), svn), Default: 'github'}
-
-\item{output.opts}{parameters to pass to the output function}
 }
 \value{
-data.frame
+widget
 }
 \description{
 Visually inpsect the directory structure of it before cloning/fetching/pulling
