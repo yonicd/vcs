@@ -57,6 +57,12 @@ grepr=function(pattern,path,recursive=FALSE, whole_word = FALSE, padding=0,use_c
     vcs <- path$vcs
   } 
 
+  if(vcs=='local'){
+    
+    fl <- fl[!sapply(fl,is.binary)]
+  
+  }
+  
   out=sapply(fl,function(x){
     args=grepVars
     args$pattern=pattern
@@ -65,7 +71,24 @@ grepr=function(pattern,path,recursive=FALSE, whole_word = FALSE, padding=0,use_c
     args$x=switch(vcs,
             local= {readLines(x,warn = FALSE)},
             svn  = {system(sprintf('svn cat %s',x),intern = TRUE)},
-                   { s<-httr::content(httr::GET(x))
+            ghe  = {
+              
+              s <- httr::content(
+                      httr::GET(x,
+                        httr::add_headers(
+                          Authorization = sprintf('token %s',Sys.getenv('GHE_PAT'))
+                        )
+                      )
+                    )
+              
+              if(length(s)>0){
+                strsplit(s,'\\n')[[1]]
+              }else{
+                c('')
+              } 
+            },
+                   { 
+                      s<-httr::content(httr::GET(x))
                      if(length(s)>0){
                        strsplit(s,'\\n')[[1]]
                      }else{
@@ -87,7 +110,16 @@ grepr=function(pattern,path,recursive=FALSE, whole_word = FALSE, padding=0,use_c
         gdx=sapply(g,function(x,pad,nmax) seq(from=pmax(1,x-pad),to=pmin(nmax,x+pad)),pad=padding,nmax=length(args$x))
         out=unique(unlist(sapply(gdx,function(i){
           if(use_crayon&!interactive){
-            ifelse(i%in%g0,sprintf('row %s: %s',i,crayon::green(gsub(pattern,crayon::red(regmatches(args$x[i], regexpr(pattern, args$x[i]))),args$x[i]))),sprintf('row %s: %s',i,args$x[i]))  
+            ifelse(i%in%g0,{
+              
+              this_pat <- regexpr(pattern, args$x[i])
+              
+              txt_red <- crayon::red(regmatches(args$x[i], this_pat))
+              
+              sprintf('row %s: %s',i,crayon::green(gsub(pattern,txt_red,args$x[i])))
+            },{
+              sprintf('row %s: %s',i,crayon::white(args$x[i])) 
+            })
           }else{
             ifelse(i%in%g0,sprintf('[row %s]: %s',i,args$x[i]),sprintf('row %s: %s',i,args$x[i]))            
           }
@@ -101,16 +133,17 @@ grepr=function(pattern,path,recursive=FALSE, whole_word = FALSE, padding=0,use_c
     } 
   })
   
-  if(interactive & vcs%in%c('github','bitbucket') ){
+  if(interactive & vcs%in%c('ghe','github','bitbucket') ){
     
     s0 <- out[sapply(out,length)>0]
 
     NAMES <- gsub(sprintf('^(.*?)%s/|\\?(.*?)$',path$branch),'',names(s0))
     
-    tree <- jsTree::jsTree$new(ls_remote(path$path))
+    tree <- jsTree::jsTree$new(ls_remote(path$path,vcs=vcs))
     
     tree$current_nodestate <- tree$data%in%NAMES
     tree$add_vcs(remote_repo = path$path,vcs = vcs,remote_branch = 'master')
+    tree$raw_token <- ghe_raw_token(path = path$path,file = tree$data[1],myPAT = Sys.getenv('GHE_PAT'))
     tree$preview_search <- pattern
     
     tree$show()
@@ -125,4 +158,12 @@ grepr=function(pattern,path,recursive=FALSE, whole_word = FALSE, padding=0,use_c
     invisible(out)
   }
   
+}
+
+
+is.binary <- function(filepath,max=1000){
+  f=file(filepath,"rb",raw=TRUE)
+  b=readBin(f,"int",max,size=1,signed=FALSE)
+  close(f)
+  return(max(b)>128)
 }

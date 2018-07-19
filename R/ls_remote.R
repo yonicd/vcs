@@ -9,7 +9,7 @@
 #' @return character
 #' @export
 #' @importFrom tools file_path_as_absolute
-#' @importFrom httr http_error GET content
+#' @importFrom httr http_error GET content add_headers
 #' @examples 
 #' #github
 #'   ls_remote('tidyverse/glue')
@@ -24,6 +24,43 @@
 ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github', full.names=FALSE){
   this_wd <- getwd()
   switch(vcs,
+         ghe={
+           
+           myPAT <- Sys.getenv('GHE_PAT')
+           
+           get_git <- sprintf('https://ghe.metrumrg.com/api/v3/repos/%s/git/trees/%s?recursive=1',path,branch)
+           
+           x <- httr::GET(get_git,
+                          httr::add_headers(
+                            Authorization = sprintf('token %s',myPAT)
+                          )
+           )
+           
+           tr <- httr::content(x)$tree
+           s <- sapply(tr,function(x) if(x$mode!='040000') x$path)
+           s <- unlist(s)
+           if(!is.null(subdir)){
+             if(subdir=='.'){
+               s=s[!grepl('/',s)]
+             }else{
+               s=grep(paste0('^',subdir,'(.*?)/'),s,value=TRUE)   
+             }
+           }
+           
+           if(full.names){ 
+             
+             raw_git <- sprintf('https://ghe.metrumrg.com/raw/%s/%s/%s',path,branch,s)
+             
+             dlPAT <- ghe_raw_token(path,file = s[1])
+             
+             raw_git <- sprintf('%s?%s',raw_git,dlPAT)
+             
+             s <- raw_git
+           }
+           
+           pathout <- s
+           
+         },
          github={
            
            myPAT <- Sys.getenv('GITHUB_PAT')
