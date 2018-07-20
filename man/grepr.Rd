@@ -5,7 +5,7 @@
 \title{Recursive grep}
 \usage{
 grepr(pattern, path, recursive = FALSE, whole_word = FALSE, padding = 0,
-  use_crayon = TRUE, interactive = FALSE, ...)
+  use_crayon = TRUE, interactive = FALSE, marker = FALSE, ...)
 }
 \arguments{
 \item{pattern}{character, string containing a regular expression}

@@ -94,7 +94,8 @@ ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github', ful
              
               if(nzchar(myPAT)){
                dlPAT <- gsub('^(.*?)\\?','',httr::content(httr::GET(sprintf('https://api.github.com/repos/%s/contents/%s?access_token=%s',path,s[1],myPAT)))$download_url)
-               raw_git <- sprintf('%s?%s',raw_git,dlPAT)
+               if(!dlPAT%in%raw_git)
+                raw_git <- sprintf('%s?%s',raw_git,dlPAT)
               }
            
               s <- raw_git

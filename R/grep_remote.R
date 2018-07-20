@@ -33,8 +33,11 @@
 #' @importFrom utils tail head
 #' @importFrom crayon green red
 #' @importFrom jsTree jsTree
-grepr=function(pattern,path,recursive=FALSE, whole_word = FALSE, padding=0,use_crayon = TRUE, interactive=FALSE, ...){
+grepr <- function(pattern,path,recursive=FALSE, whole_word = FALSE, padding=0,use_crayon = TRUE, interactive=FALSE,marker = FALSE, ...){
 
+  if(marker)
+    use_crayon <- FALSE
+  
   if(whole_word)
     pattern <- sprintf('\\b%s\\b',pattern)
     
@@ -89,7 +92,8 @@ grepr=function(pattern,path,recursive=FALSE, whole_word = FALSE, padding=0,use_c
             },
                    { 
                       s<-httr::content(httr::GET(x))
-                     if(length(s)>0){
+                      
+                     if(length(s)>0&inherits(s,'character')){
                        strsplit(s,'\\n')[[1]]
                      }else{
                        c('')
@@ -151,9 +155,13 @@ grepr=function(pattern,path,recursive=FALSE, whole_word = FALSE, padding=0,use_c
   }else{
     out <- out[sapply(out,length)>0]
     
+    if(!marker){
     ret <- lapply(names(out),function(x){
       cat(sprintf('\n%s\n',x), out[[x]], sep ='\n')
     })
+    }else{
+      make_marker(pattern,out)
+    }
     
     invisible(out)
   }
