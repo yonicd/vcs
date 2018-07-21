@@ -3,10 +3,12 @@
 #' @param pattern   character, string containing a regular expression
 #' @param path      character, path to search, see details
 #' @param recursive boolean, Should the listing recurse into directories? passed to list.files, Default: FALSE
-#' @param whole_word boolean, if TRUE then the pattern will be wrapped with \\bpattern\\b internally, Default: FALSE
+#' @param ...       arguments passed to grep
+#' @param whole_word boolean, if TRUE then the pattern will be 
+#'   wrapped with \\bpattern\\b internally, Default: FALSE
 #' @param padding   integer, number of rows to return in addition to the query line, Default: 5
 #' @param use_crayon boolean, use crayon colors in console output, Default: TRUE
-#' @param ...       arguments passed to grep
+#' @param marker boolean, use rstudioapi marker, Default: interactive()
 #' @return grepr(value = FALSE) returns a vector of the indices of the elements of x 
 #' that yielded a match (or not, for invert = TRUE. 
 #' This will be an integer vector unless the input is a long vector, when it will be a double vector.
@@ -26,14 +28,21 @@
 #' grepr(pattern = 'importFrom',path = remotepath,value=TRUE)
 #' grepr(pattern = 'importFrom',path = remotepath,value=TRUE,padding=3)
 #' grepr(pattern = 'tags$script',
-#'       path = list(path = 'timelyportfolio/vueR',subdir='R|inst',vcs='github'),
+#'       path = list(path = 'timelyportfolio/vueR',subdir='R|inst',vcs='github',PAT = Sys.getenv('GITHUB_PAT')),
 #' padding=3,value=TRUE,fixed=TRUE)}
 #' @export
 #' @importFrom httr content GET parse_url
 #' @importFrom utils tail head
 #' @importFrom crayon green red
-#' @importFrom jsTree jsTree
-grepr <- function(pattern,path,recursive=FALSE, whole_word = FALSE, padding=0,use_crayon = TRUE, interactive=FALSE,marker = FALSE, ...){
+grepr <- function(pattern,
+                  path,
+                  recursive=FALSE,
+                  ... ,
+                  whole_word = FALSE,
+                  padding=1,
+                  use_crayon = TRUE,
+                  marker = interactive()
+                  ){
 
   if(marker)
     use_crayon <- FALSE
@@ -69,7 +78,9 @@ grepr <- function(pattern,path,recursive=FALSE, whole_word = FALSE, padding=0,us
   out=sapply(fl,function(x){
     args=grepVars
     args$pattern=pattern
-    if(is.null(args$value)||interactive) args$value=FALSE
+    if(is.null(args$value)){
+      args$value <- FALSE 
+    }
     
     args$x=switch(vcs,
             local= {readLines(x,warn = FALSE)},
@@ -79,7 +90,7 @@ grepr <- function(pattern,path,recursive=FALSE, whole_word = FALSE, padding=0,us
               s <- httr::content(
                       httr::GET(x,
                         httr::add_headers(
-                          Authorization = sprintf('token %s',Sys.getenv('GHE_PAT'))
+                          Authorization = sprintf('token %s',path$PAT)
                         )
                       )
                     )
@@ -122,7 +133,7 @@ grepr <- function(pattern,path,recursive=FALSE, whole_word = FALSE, padding=0,us
         } 
         gdx=sapply(g,function(x,pad,nmax) seq(from=pmax(1,x-pad),to=pmin(nmax,x+pad)),pad=padding,nmax=length(args$x))
         out=unique(unlist(sapply(gdx,function(i){
-          if(use_crayon&!interactive){
+          if(use_crayon){
             ifelse(i%in%g0,{
               
               this_pat <- regexpr(pattern, args$x[i])
@@ -146,22 +157,6 @@ grepr <- function(pattern,path,recursive=FALSE, whole_word = FALSE, padding=0,us
     } 
   })
   
-  if(interactive & vcs%in%c('ghe','github','bitbucket') ){
-    
-    s0 <- out[sapply(out,length)>0]
-
-    NAMES <- gsub(sprintf('^(.*?)%s/|\\?(.*?)$',path$branch),'',names(s0))
-    
-    tree <- jsTree::jsTree$new(ls_remote(path$path,vcs=vcs))
-    
-    tree$current_nodestate <- tree$data%in%NAMES
-    tree$add_vcs(remote_repo = path$path,vcs = vcs,remote_branch = 'master')
-    tree$raw_token <- ghe_raw_token(path = path$path,file = tree$data[1],myPAT = Sys.getenv('GHE_PAT'))
-    tree$preview_search <- pattern
-    
-    tree$show()
-    
-  }else{
     out <- out[sapply(out,length)>0]
     
     if(!marker){
@@ -173,7 +168,7 @@ grepr <- function(pattern,path,recursive=FALSE, whole_word = FALSE, padding=0,us
     }
     
     invisible(out)
-  }
+  
   
 }
 

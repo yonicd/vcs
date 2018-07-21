@@ -21,18 +21,25 @@
 #'    #'master' branch
 #'     ls_remote('metrumrg/qapply',vcs='bitbucket')
 #' 
-ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github', full.names=FALSE){
+ls_remote <- function(
+  path=getwd(),
+  branch='master',
+  subdir=NULL,
+  vcs='github', 
+  full.names=FALSE, 
+  PAT = Sys.getenv('GITHUB_PAT')
+  ){
+  
   this_wd <- getwd()
+  
   switch(vcs,
          ghe={
-           
-           myPAT <- Sys.getenv('GHE_PAT')
-           
+
            get_git <- sprintf('https://ghe.metrumrg.com/api/v3/repos/%s/git/trees/%s?recursive=1',path,branch)
            
            x <- httr::GET(get_git,
                           httr::add_headers(
-                            Authorization = sprintf('token %s',myPAT)
+                            Authorization = sprintf('token %s',PAT)
                           )
            )
            
@@ -62,15 +69,13 @@ ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github', ful
            
          },
          github={
-           
-           myPAT <- Sys.getenv('GITHUB_PAT')
-           
+
            uri_git <- sprintf('https://api.github.com/repos/%s',path)
            get_git <- sprintf('https://api.github.com/repos/%s/git/trees/%s%s',path,branch,'?recursive=1')
            
-           if(nzchar(myPAT)){
-             uri_git <- sprintf('%s?access_token=%s',uri_git,Sys.getenv('GITHUB_PAT'))
-             get_git <- sprintf('%s&access_token=%s',get_git,Sys.getenv('GITHUB_PAT'))
+           if(nzchar(PAT)){
+             uri_git <- sprintf('%s?access_token=%s',uri_git,PAT)
+             get_git <- sprintf('%s&access_token=%s',get_git,PAT)
              }
            
            chk_git <- httr::http_error(uri_git)
@@ -92,8 +97,8 @@ ls_remote <- function(path=getwd(),branch='master',subdir=NULL,vcs='github', ful
              
               raw_git <- sprintf('https://raw.githubusercontent.com/%s/%s/%s',path,branch,s) 
              
-              if(nzchar(myPAT)){
-               dlPAT <- gsub('^(.*?)\\?','',httr::content(httr::GET(sprintf('https://api.github.com/repos/%s/contents/%s?access_token=%s',path,s[1],myPAT)))$download_url)
+              if(nzchar(PAT)){
+               dlPAT <- gsub('^(.*?)\\?','',httr::content(httr::GET(sprintf('https://api.github.com/repos/%s/contents/%s?access_token=%s',path,s[1],PAT)))$download_url)
                if(!dlPAT%in%raw_git)
                 raw_git <- sprintf('%s?%s',raw_git,dlPAT)
               }

@@ -4,8 +4,8 @@
 \alias{grepr}
 \title{Recursive grep}
 \usage{
-grepr(pattern, path, recursive = FALSE, whole_word = FALSE, padding = 0,
-  use_crayon = TRUE, interactive = FALSE, marker = FALSE, ...)
+grepr(pattern, path, recursive = FALSE, ..., whole_word = FALSE,
+  padding = 1, use_crayon = TRUE, marker = interactive())
 }
 \arguments{
 \item{pattern}{character, string containing a regular expression}
@@ -14,13 +14,16 @@ grepr(pattern, path, recursive = FALSE, whole_word = FALSE, padding = 0,
 
 \item{recursive}{boolean, Should the listing recurse into directories? passed to list.files, Default: FALSE}
 
-\item{whole_word}{boolean, if TRUE then the pattern will be wrapped with \\bpattern\\b internally, Default: FALSE}
+\item{...}{arguments passed to grep}
+
+\item{whole_word}{boolean, if TRUE then the pattern will be 
+wrapped with \\bpattern\\b internally, Default: FALSE}
 
 \item{padding}{integer, number of rows to return in addition to the query line, Default: 5}
 
 \item{use_crayon}{boolean, use crayon colors in console output, Default: TRUE}
 
-\item{...}{arguments passed to grep}
+\item{marker}{boolean, use rstudioapi marker, Default: interactive()}
 }
 \value{
 grepr(value = FALSE) returns a vector of the indices of the elements of x 
@@ -47,6 +50,6 @@ grepr(pattern = 'importFrom',path = remotepath)
 grepr(pattern = 'importFrom',path = remotepath,value=TRUE)
 grepr(pattern = 'importFrom',path = remotepath,value=TRUE,padding=3)
 grepr(pattern = 'tags$script',
-      path = list(path = 'timelyportfolio/vueR',subdir='R|inst',vcs='github'),
+      path = list(path = 'timelyportfolio/vueR',subdir='R|inst',vcs='github',PAT = Sys.getenv('GITHUB_PAT')),
 padding=3,value=TRUE,fixed=TRUE)}
 }

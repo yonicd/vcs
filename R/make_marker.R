@@ -16,8 +16,9 @@ make_marker <- function(pattern,x){
                         
                       lapply(x[[nx]],function(xx){
                         r <- as.numeric(gsub('\\D','',gsub(':(.*?)$','',xx)))
+                        type <- ifelse(grepl('\\[',gsub(':(.*?)$','',xx)),'info','usage')
                         l <- gsub('^(.*?):','',xx)
-                        list(type='info',file=new_nx,line=r,column=1,message=l) 
+                        list(type=type,file=new_nx,line=r,column=1,message=l) 
                       })
                     }),recursive = FALSE),
                     basePath = getwd(),
