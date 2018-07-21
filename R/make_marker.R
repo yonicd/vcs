@@ -1,4 +1,3 @@
-#' @importFrom httr parse_url
 make_marker <- function(pattern,x){
 
   rstudioapi::callFun("sourceMarkers",
@@ -7,16 +6,12 @@ make_marker <- function(pattern,x){
                       
                       if(!is.null(httr::parse_url(nx)$scheme)){
                         
-                        new_nx <- file.path(tempdir(),basename(nx))
-                        
-                        cat(
-                          readLines(nx),
-                          file = new_nx,
-                          sep='\n'
-                          )
-                      
+                        new_nx <- file.path(tempdir(),basename(gsub('\\?(.*?)$','',nx)))
+
                       }else{
+                        
                         new_nx <- nx
+                        
                       }
                         
                       lapply(x[[nx]],function(xx){

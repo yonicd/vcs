@@ -5,7 +5,7 @@
 \title{Visually inspect structure of git repository before initial fetch}
 \usage{
 navigate_remote(path = getwd(), branch = "master", vcs = "github",
-  show = TRUE)
+  show_tree = TRUE)
 }
 \arguments{
 \item{path}{character, Path to root directory of git repository or a name of a github/bitbucket repository, Default: setwd()}
@@ -13,6 +13,8 @@ navigate_remote(path = getwd(), branch = "master", vcs = "github",
 \item{branch}{character, alias of the github/bitbucket branch to retrieve directory structure, Default: 'master'}
 
 \item{vcs}{character, choose which version control system to search (github, bitbucket, git (head of checkout repo), svn), Default: 'github'}
+
+\item{show_tree}{boolean, show jsTree widget output in viewer, Default: TRUE}
 }
 \value{
 widget

@@ -29,7 +29,7 @@
 #'       path = list(path = 'timelyportfolio/vueR',subdir='R|inst',vcs='github'),
 #' padding=3,value=TRUE,fixed=TRUE)}
 #' @export
-#' @importFrom httr content GET
+#' @importFrom httr content GET parse_url
 #' @importFrom utils tail head
 #' @importFrom crayon green red
 #' @importFrom jsTree jsTree
@@ -106,6 +106,15 @@ grepr <- function(pattern,path,recursive=FALSE, whole_word = FALSE, padding=0,us
       args0$value=FALSE
       g0=do.call(grep,args0)
       if(length(g0)>0){
+
+        if(!is.null(httr::parse_url(x)$scheme)){
+        cat(s,
+            file = file.path(
+              tempdir(),
+              basename(gsub('\\?(.*?)$','',x)))
+            )
+        }
+        
         g=g0
         if(length(g0)>1){
           rmIdx=which(utils::tail(g0,-1)-utils::head(g0,-1)<=padding)
