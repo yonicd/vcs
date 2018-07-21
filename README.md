@@ -18,6 +18,7 @@ devtools::install_github('metrumresearchgroup/vcs')
   - **setwd_remote**: replace inline script from local path to remote path
   - **source_remote**: source script on remote branches, works for reading in data on remote and nested sourcing
 
+
 ### Functionalities that clone or update a cloned repository
   - **diff_head**: query the difference in files between current fetch and the HEAD of a repository
   - **sparse_checkout**: create a sparse checkout of a repository on github/bitbucket/svn
