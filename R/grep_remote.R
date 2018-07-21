@@ -44,16 +44,22 @@ grepr <- function(pattern,
                   marker = interactive()
                   ){
 
-  if(marker)
-    use_crayon <- FALSE
-  
-  if(whole_word)
-    pattern <- sprintf('\\b%s\\b',pattern)
-    
   grepVars=list(...)
   
   list2env(grepVars,envir = environment())
   
+  if(marker){
+    use_crayon <- FALSE
+    grepVars$value <- TRUE
+  }
+  
+  if(use_crayon){
+    grepVars$value <- TRUE
+  }
+  
+  if(whole_word)
+    pattern <- sprintf('\\b%s\\b',pattern)
+    
   if(is.character(path)) fl=list.files(path,recursive = recursive,full.names = TRUE)
   vcs='local'
   
@@ -118,7 +124,7 @@ grepr <- function(pattern,
       g0=do.call(grep,args0)
       if(length(g0)>0){
 
-        if(!is.null(httr::parse_url(x)$scheme)){
+        if(marker&!is.null(httr::parse_url(x)$scheme)){
         cat(s,
             file = file.path(
               tempdir(),

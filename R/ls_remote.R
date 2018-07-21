@@ -8,7 +8,6 @@
 #' If FALSE, the file names (rather than paths) are returned, Default: TRUE
 #' @return character
 #' @export
-#' @importFrom tools file_path_as_absolute
 #' @importFrom httr http_error GET content add_headers
 #' @examples 
 #' #github
@@ -124,7 +123,7 @@ ls_remote <- function(
            pathout <- s
          },
          git={
-           setwd(tools::file_path_as_absolute(path))
+           setwd(normalizePath(path))
            s <- system('git ls-tree -r HEAD --name-only',intern=TRUE)
            if(!is.null(subdir)){
              if(subdir=='.'){
@@ -141,7 +140,7 @@ ls_remote <- function(
            
            if(dir.exists(path)){
              newdir=FALSE
-             td <- tools::file_path_as_absolute(path)
+             td <- normalizePath(path)
            }else{
              newdir=TRUE
              td <- tempdir()  
