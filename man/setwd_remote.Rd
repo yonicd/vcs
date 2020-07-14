@@ -4,9 +4,17 @@
 \alias{setwd_remote}
 \title{Set the working directory to a Github repository URL address}
 \usage{
-setwd_remote(r.script.raw, repo, branch = "master", subdir,
-  vcs = "github", vcsdir, vcsenv, tokens_base = c("source", "read"),
-  tokens_add = NULL)
+setwd_remote(
+  r.script.raw,
+  repo,
+  branch = "master",
+  subdir,
+  vcs = "github",
+  vcsdir,
+  vcsenv,
+  tokens_base = c("source", "read"),
+  tokens_add = NULL
+)
 }
 \arguments{
 \item{r.script.raw}{character, script to append remote path.}

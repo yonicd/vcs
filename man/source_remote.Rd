@@ -4,8 +4,15 @@
 \alias{source_remote}
 \title{Source File on a Remote Repository}
 \usage{
-source_remote(repo, subdir, r.file, tokens = NULL, branch = "master",
-  vcs = "github", flag = TRUE)
+source_remote(
+  repo,
+  subdir,
+  r.file,
+  tokens = NULL,
+  branch = "master",
+  vcs = "github",
+  flag = TRUE
+)
 }
 \arguments{
 \item{repo}{character, username/repo_name}

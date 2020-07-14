@@ -39,9 +39,9 @@ path_down <- tempfile(pattern = 'gsubr-',
 fileext = '.txt', 
 tmpdir = file.path(tempdir(), 'gsubr/d'))
 
-cat('this is a test',sep='\\n',file = path_up)
+cat('this is a test',sep='\n',file = path_up)
 
-cat('this is a test in the subdir',sep='\\n',file = path_down)
+cat('this is a test in the subdir',sep='\n',file = path_down)
 
 list.files(tempdir(),recursive = TRUE)
 

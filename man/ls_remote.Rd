@@ -4,8 +4,14 @@
 \alias{ls_remote}
 \title{Inspect directory structure of version control system repository}
 \usage{
-ls_remote(path = getwd(), branch = "master", subdir = NULL,
-  vcs = "github", full.names = FALSE, PAT = Sys.getenv("GITHUB_PAT"))
+ls_remote(
+  path = getwd(),
+  branch = "master",
+  subdir = NULL,
+  vcs = "github",
+  full.names = FALSE,
+  PAT = Sys.getenv("GITHUB_PAT")
+)
 }
 \arguments{
 \item{path}{character, Path to root directory of git/svn repository or a name of a github/bitbucket repository, Default: setwd()}

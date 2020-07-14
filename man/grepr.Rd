@@ -4,8 +4,16 @@
 \alias{grepr}
 \title{Recursive grep}
 \usage{
-grepr(pattern, path, recursive = FALSE, ..., whole_word = FALSE,
-  padding = 1, use_crayon = TRUE, marker = interactive())
+grepr(
+  pattern,
+  path,
+  recursive = FALSE,
+  ...,
+  whole_word = FALSE,
+  padding = 1,
+  use_crayon = TRUE,
+  marker = interactive()
+)
 }
 \arguments{
 \item{pattern}{character, string containing a regular expression}
