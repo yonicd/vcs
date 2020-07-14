@@ -4,9 +4,9 @@
 \alias{sparse_checkout}
 \title{Create a sparse git repository}
 \usage{
-sparse_checkout(repo_url, dest.dir, queries, vcs = "git", create = TRUE,
-  append = TRUE, remote = "origin", branch = "master", depth = Inf,
-  svn.set.depth = "immediates")
+sparse_checkout(repo_url, dest.dir, queries, vcs = "git",
+  create = TRUE, append = TRUE, remote = "origin",
+  branch = "master", depth = Inf, svn.set.depth = "immediates")
 }
 \arguments{
 \item{repo_url}{character, repository url path}

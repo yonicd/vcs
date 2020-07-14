@@ -27,6 +27,28 @@ for(idx in 1:length(x)){
 }
 diff<-length(x.now)-length(x)
 }
-ret<-data.frame(vcs=gsub('^[.]{1}','',basename(x)),dir=dirname(x),stringsAsFactors = FALSE)
+
+ret <- data.frame(vcs=gsub('^[.]{1}','',basename(x)),dir=dirname(x),remote = NA,stringsAsFactors = FALSE)
+
+if(nrow(ret)>0){
+  for(i in 1:nrow(ret)){
+    ret$remote[i] <- query_remote(ret$vcs[i],ret$dir[i])  
+  }  
+}
+
 ret
+
+}
+
+query_remote <- function(x,y){
+  
+  if(x=='git'){
+    this <- sprintf('cat %s/.git/config | grep url',y)
+  }
+  
+  if(x=='svn'){
+    this <- sprintf("svn info %s | grep URL",y)
+  }
+  
+  gsub('^(.*?)[=:]\\s*','',system(this,intern = TRUE)[1])
 }

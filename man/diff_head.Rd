@@ -4,7 +4,8 @@
 \alias{diff_head}
 \title{Query the difference in files between current fetch and the head of a repository}
 \usage{
-diff_head(path = ".", vcs = "git", pattern = NULL, ..., show = TRUE)
+diff_head(path = ".", vcs = "git", pattern = NULL, ...,
+  show = TRUE)
 }
 \arguments{
 \item{path}{character, Path to root directory of git/svn repository, Default: '.'}

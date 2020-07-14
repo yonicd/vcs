@@ -4,7 +4,8 @@
 \alias{collapse_pipe}
 \title{Collapse lines of piped calls to single lines}
 \usage{
-collapse_pipe(pattern = "\%[[:punct:]]\%|[+]", x, comment_tokens = NULL)
+collapse_pipe(pattern = "\%[[:punct:]]\%|[+]", x,
+  comment_tokens = NULL)
 }
 \arguments{
 \item{pattern}{character, symbols to collapse on Default: '\%[[:punct:]]\%|[+]'}
